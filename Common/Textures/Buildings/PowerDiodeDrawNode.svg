@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <clipPath id="body"><rect x="12" y="12" width="104" height="104" rx="5"/></clipPath>
+    <clipPath id="drawPanel"><rect x="21" y="27" width="86" height="68" rx="4"/></clipPath>
+  </defs>
+  <rect x="12" y="12" width="104" height="104" rx="5" fill="#000000"/>
+  <g clip-path="url(#body)">
+    <rect x="12" y="12" width="104" height="85" fill="#606c7a"/>
+    <rect x="12" y="97" width="104" height="19" fill="#26282b"/>
+    <!-- tan mounting panel, steel frame margin left showing around it like the vanilla battery/power switch -->
+    <rect x="21" y="27" width="86" height="68" rx="4" fill="#9f9585"/>
+    <!-- raised look: bottom shadow edge only, RimWorld doesn't lighten the top of elevated sections -->
+    <g clip-path="url(#drawPanel)">
+      <rect x="21" y="90" width="86" height="5" fill="#7d7566"/>
+    </g>
+    <!-- intake grille: recessed vent slats pulling air into the building, recentered on the flat
+         part of the panel now that the bottom edge is raised -->
+    <rect x="28" y="31.5" width="72" height="6" rx="2" fill="#4a5560"/>
+    <rect x="28" y="31.5" width="72" height="2" fill="#3c4550"/>
+    <rect x="28" y="43.5" width="72" height="6" rx="2" fill="#4a5560"/>
+    <rect x="28" y="43.5" width="72" height="2" fill="#3c4550"/>
+    <rect x="28" y="55.5" width="72" height="6" rx="2" fill="#4a5560"/>
+    <rect x="28" y="55.5" width="72" height="2" fill="#3c4550"/>
+    <rect x="28" y="67.5" width="72" height="6" rx="2" fill="#4a5560"/>
+    <rect x="28" y="67.5" width="72" height="2" fill="#3c4550"/>
+    <rect x="28" y="79.5" width="72" height="6" rx="2" fill="#4a5560"/>
+    <rect x="28" y="79.5" width="72" height="2" fill="#3c4550"/>
+  </g>
+  <rect x="12" y="12" width="104" height="104" rx="5" fill="none" stroke="#000000" stroke-width="5"/>
+  <rect x="52" y="4" width="24" height="12" rx="2" fill="#2b2b2b"/>
+  <rect x="52" y="112" width="24" height="12" rx="2" fill="#1c1d1f"/>
+  <rect x="4" y="52" width="12" height="24" rx="2" fill="#242527"/>
+  <rect x="112" y="52" width="12" height="24" rx="2" fill="#242527"/>
+  <circle cx="24" cy="24" r="3.5" fill="#2b2b2b"/>
+  <circle cx="24" cy="104" r="3.5" fill="#1c1d1f"/>
+</svg>

@@ -1,0 +1,45 @@
+[b]Power Diode[/b] adds a one-way power valve to your colony: a pair of buildings that let power flow from one power network to another without merging them into a single grid.
+
+[h1]How it works[/h1]
+
+Build a [b]power diode intake[/b] on the network you want to draw from, and a [b]power diode outlet[/b] directly adjacent to it, wired into whatever network you want to feed - the outlet is just a normal power producer as far as that network is concerned. The two link up automatically - no wiring or research beyond Electricity required - and power only ever flows from the intake's side to the outlet's side, never back the other way.
+
+The outlet:
+[list]
+[*] has a [b]wattage cap[/b] slider, and never feeds more than that,
+[*] never feeds more than its own network currently needs, including charging batteries,
+[*] never feeds more than the intake's network currently has to spare, so it can't drag your main grid into a brownout to top off a side project,
+[*] has a [b]battery reserve[/b] slider, letting you protect a chosen amount of stored energy (in watt-days) in batteries on the intake's side, so the diode tapers off and stops instead of draining a backup bank dry.
+[/list]
+
+Both buildings behave safely on their own - an unpaired or partner-less building just sits at 0 W, with the inspect string telling you why. If some other piece of wiring elsewhere on the map ends up joining the intake's and outlet's networks into one grid, the diode notices the shared connection and disables itself, with an on-map indicator.
+
+[h1]Why not just merge the networks?[/h1]
+
+A few real ways to use this:
+[list]
+[*] Keep a section of your base charged up with priority, feeding it from the main grid without letting it drag the rest of the base down when it's hungry.
+[*] Charge up a gravship from the base grid without the gravship's batteries getting drained back out whenever the base needs extra power.
+[*] Moving your base? Feed power over to the new location's grid ahead of time, before you deconstruct the old one.
+[/list]
+
+[h1]Requirements[/h1]
+[list]
+[*] [url=https://steamcommunity.com/workshop/filedetails/?id=2009463077]Harmony[/url]
+[*] [url=https://steamcommunity.com/workshop/filedetails/?id=3296362231]ilyvion's Laboratory[/url]
+[/list]
+
+[h1]Translations[/h1]
+[list]
+[*] [i]None yet[/i]
+[/list]
+Want your translation in this list? Release a translation mod (i.e. a mod with only a Languages folder, [i]not a copy of this entire mod + the translation[/i]) for this mod, and notify me of its existence, and I'll add it to the list.
+
+[h1]Source code[/h1]
+
+Source code can be found on [url=https://github.com/ilyvion/power-diode]GitHub[/url]. Report any bugs or feature suggestions/requests on the [url=https://github.com/ilyvion/power-diode/issues]issue tracker[/url].
+
+[h1]Like my work?[/h1]
+[url=https://ko-fi.com/ilyvion][img]https://alexanderschroeder.net/files/steam/kofi_brandasset/support_me_on_kofi_beige.png[/img][/url]
+
+Feel free to [url=https://discord.gg/J9Q78avHgM]join my Discord server[/url] if you want to talk to me (and other members) about my projects, or just to hang out, I guess. :)

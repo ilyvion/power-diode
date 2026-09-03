@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- connector clamp: content sits at the north edge; rotated at runtime to face whichever
+       side the paired building is actually on -->
+  <rect x="44" y="-4" width="40" height="26" rx="4" fill="#4a4d52" stroke="#1c1d1f" stroke-width="4"/>
+  <rect x="52" y="16" width="24" height="10" rx="2" fill="#2a2c2f" stroke="#1c1d1f" stroke-width="3"/>
+  <rect x="48" y="0" width="32" height="6" rx="2" fill="#6b6f76"/>
+</svg>

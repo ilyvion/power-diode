@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+    <ThingDef ParentName="BuildingBase">
+        <defName>PowerDiode_DrawNode</defName>
+        <label>power diode intake</label>
+        <description>Draws power from this network on behalf of a paired power diode outlet, up to whatever the outlet's wattage cap and its own network's surplus allow. Draws nothing when unpaired, or when its paired outlet isn't feeding.</description>
+        <thingClass>Building</thingClass>
+        <drawerType>MapMeshAndRealTime</drawerType>
+        <graphicData>
+            <texPath>Buildings/PowerDiodeDrawNode</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+            <drawSize>(1,1)</drawSize>
+        </graphicData>
+        <altitudeLayer>Building</altitudeLayer>
+        <passability>PassThroughOnly</passability>
+        <pathCost>50</pathCost>
+        <fillPercent>0.5</fillPercent>
+        <useHitPoints>true</useHitPoints>
+        <tickerType>Normal</tickerType>
+        <statBases>
+            <MaxHitPoints>100</MaxHitPoints>
+            <WorkToBuild>800</WorkToBuild>
+            <Mass>15</Mass>
+            <Flammability>1.0</Flammability>
+        </statBases>
+        <size>(1,1)</size>
+        <costList>
+            <Steel>40</Steel>
+            <ComponentIndustrial>1</ComponentIndustrial>
+        </costList>
+        <comps>
+            <li Class="CompProperties_Power">
+                <compClass>CompPowerTrader</compClass>
+                <transmitsPower>true</transmitsPower>
+                <basePowerConsumption>0</basePowerConsumption>
+                <shortCircuitInRain>true</shortCircuitInRain>
+            </li>
+            <li Class="PowerDiode.CompProperties_PowerDiodeDraw" />
+        </comps>
+        <designationCategory>Power</designationCategory>
+        <constructEffect>ConstructMetal</constructEffect>
+        <researchPrerequisites>
+            <li>Electricity</li>
+        </researchPrerequisites>
+    </ThingDef>
+
+    <ThingDef ParentName="BuildingBase">
+        <defName>PowerDiode_FeedNode</defName>
+        <label>power diode outlet</label>
+        <description>Feeds power to this network from a paired power diode intake, up to a configurable wattage cap, and never more than the intake's network currently has to spare. Must be built directly adjacent to an unpaired intake.</description>
+        <thingClass>Building</thingClass>
+        <drawerType>MapMeshAndRealTime</drawerType>
+        <graphicData>
+            <texPath>Buildings/PowerDiodeFeedNode</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+            <drawSize>(1,1)</drawSize>
+        </graphicData>
+        <altitudeLayer>Building</altitudeLayer>
+        <passability>PassThroughOnly</passability>
+        <pathCost>50</pathCost>
+        <fillPercent>0.5</fillPercent>
+        <useHitPoints>true</useHitPoints>
+        <tickerType>Normal</tickerType>
+        <statBases>
+            <MaxHitPoints>100</MaxHitPoints>
+            <WorkToBuild>800</WorkToBuild>
+            <Mass>15</Mass>
+            <Flammability>1.0</Flammability>
+        </statBases>
+        <size>(1,1)</size>
+        <costList>
+            <Steel>40</Steel>
+            <ComponentIndustrial>2</ComponentIndustrial>
+        </costList>
+        <comps>
+            <li Class="CompProperties_Power">
+                <compClass>CompPowerTrader</compClass>
+                <transmitsPower>true</transmitsPower>
+                <basePowerConsumption>0</basePowerConsumption>
+                <shortCircuitInRain>true</shortCircuitInRain>
+            </li>
+            <li Class="PowerDiode.CompProperties_PowerDiodeFeed">
+                <maxAllowedWattage>5000</maxAllowedWattage>
+                <wattageStepSize>25</wattageStepSize>
+                <minReserveWattDays>10</minReserveWattDays>
+                <maxReserveWattDays>500</maxReserveWattDays>
+                <reserveWattDaysStepSize>10</reserveWattDaysStepSize>
+            </li>
+        </comps>
+        <placeWorkers>
+            <li>PowerDiode.PlaceWorker_PowerDiodeFeed</li>
+        </placeWorkers>
+        <designationCategory>Power</designationCategory>
+        <constructEffect>ConstructMetal</constructEffect>
+        <researchPrerequisites>
+            <li>Electricity</li>
+        </researchPrerequisites>
+    </ThingDef>
+</Defs>

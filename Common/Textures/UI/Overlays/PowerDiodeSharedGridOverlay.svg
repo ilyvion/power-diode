@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- two plug prongs facing each other, flat UI-icon style -->
+  <rect x="4" y="27" width="16" height="10" rx="2" fill="#82878e"/>
+  <rect x="44" y="27" width="16" height="10" rx="2" fill="#82878e"/>
+  <rect x="20" y="18" width="10" height="28" rx="2" fill="#5a5e65"/>
+  <rect x="34" y="18" width="10" height="28" rx="2" fill="#5a5e65"/>
+  <!-- red slash: connection blocked -->
+  <path d="M12 12 L52 52" fill="none" stroke="#d64545" stroke-width="9" stroke-linecap="round"/>
+</svg>

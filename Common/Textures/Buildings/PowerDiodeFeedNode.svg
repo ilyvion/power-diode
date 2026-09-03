@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <clipPath id="body"><rect x="12" y="12" width="104" height="104" rx="5"/></clipPath>
+    <radialGradient id="dome" cx="0.35" cy="0.32" r="0.75">
+      <stop offset="0%" stop-color="#9aa6b2"/>
+      <stop offset="55%" stop-color="#78838f"/>
+      <stop offset="100%" stop-color="#4c545d"/>
+    </radialGradient>
+    <clipPath id="ventPanel"><rect x="78" y="30" width="26" height="58"/></clipPath>
+  </defs>
+  <rect x="12" y="12" width="104" height="104" rx="5" fill="#000000"/>
+  <g clip-path="url(#body)">
+    <rect x="12" y="12" width="104" height="85" fill="#606c7a"/>
+    <rect x="12" y="97" width="104" height="19" fill="#26282b"/>
+    <!-- output coupling: a raised turbine-cap dome pushing power out of the building -->
+    <circle cx="48" cy="56" r="22" fill="url(#dome)"/>
+    <circle cx="48" cy="41" r="3" fill="#454d55"/>
+    <circle cx="61" cy="48.5" r="3" fill="#454d55"/>
+    <circle cx="61" cy="63.5" r="3" fill="#454d55"/>
+    <circle cx="48" cy="71" r="3" fill="#454d55"/>
+    <circle cx="35" cy="63.5" r="3" fill="#454d55"/>
+    <circle cx="35" cy="48.5" r="3" fill="#454d55"/>
+    <circle cx="48" cy="56" r="7" fill="#3a4048"/>
+    <!-- elevated tan panel: bottom shadow edge only, matching the draw node's raised panel -->
+    <rect x="78" y="30" width="26" height="58" fill="#9f9585"/>
+    <g clip-path="url(#ventPanel)">
+      <rect x="78" y="83" width="26" height="5" fill="#7d7566"/>
+    </g>
+  </g>
+  <rect x="12" y="12" width="104" height="104" rx="5" fill="none" stroke="#000000" stroke-width="5"/>
+  <rect x="52" y="4" width="24" height="12" rx="2" fill="#2b2b2b"/>
+  <rect x="52" y="112" width="24" height="12" rx="2" fill="#1c1d1f"/>
+  <rect x="4" y="52" width="12" height="24" rx="2" fill="#242527"/>
+  <rect x="112" y="52" width="12" height="24" rx="2" fill="#242527"/>
+  <circle cx="24" cy="24" r="3.5" fill="#2b2b2b"/>
+  <circle cx="24" cy="104" r="3.5" fill="#1c1d1f"/>
+</svg>

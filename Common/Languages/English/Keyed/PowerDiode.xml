@@ -1,2 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LanguageData></LanguageData>
+<LanguageData>
+    <PowerDiode.NotLinked>Not linked</PowerDiode.NotLinked>
+    <PowerDiode.LinkedIdle>Linked to {0}, idle</PowerDiode.LinkedIdle>
+    <PowerDiode.Feeding>Feeding {0}: {1} W</PowerDiode.Feeding>
+    <PowerDiode.SharedGrid>Linked to {0}, but disabled: another connection somewhere else joins the two sides.</PowerDiode.SharedGrid>
+    <PowerDiode.MustPlaceNextToUnpairedDrawNode>Must be placed directly adjacent to an unpaired power diode intake.</PowerDiode.MustPlaceNextToUnpairedDrawNode>
+    <PowerDiode.WattageCapGizmoTitle>Wattage cap</PowerDiode.WattageCapGizmoTitle>
+    <PowerDiode.WattageCapBarLabel>{0} / {1} W</PowerDiode.WattageCapBarLabel>
+    <PowerDiode.WattageCapTooltip>The maximum wattage this outlet will feed to its network. It never feeds more than this, and never more than its paired intake's network currently has to spare.</PowerDiode.WattageCapTooltip>
+    <PowerDiode.ReserveGizmoTitle>Battery reserve</PowerDiode.ReserveGizmoTitle>
+    <PowerDiode.ReserveBarLabel>{0} Wd</PowerDiode.ReserveBarLabel>
+    <PowerDiode.ReserveTooltip>How much stored energy (in watt-days) to keep untouched in batteries on the intake's network. As their total stored energy nears this amount, this outlet feeds less than its wattage cap; once it's reached, batteries are treated as if they have nothing left to give.</PowerDiode.ReserveTooltip>
+</LanguageData>

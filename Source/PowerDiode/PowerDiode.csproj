@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <RootNamespace>PowerDiode</RootNamespace>
+        <AssemblyName>PowerDiode</AssemblyName>
+    </PropertyGroup>
+</Project>

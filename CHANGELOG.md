@@ -7,8 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-09-03
+
 ### Added
 
 - The power diode: a pair of buildings, a power diode intake and a power diode outlet, that let power flow one-way between two otherwise-separate power networks. Build an intake on the network you want to draw from and an outlet directly next to it on the network you want to feed; the outlet has a wattage cap slider and only ever feeds as much as its network currently needs (including charging batteries), and never more than the intake's network has to spare.
 
 [Unreleased]: https://github.com/ilyvion/power-diode/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/ilyvion/power-diode/releases/tag/v0.1.0

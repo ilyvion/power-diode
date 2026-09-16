@@ -9,7 +9,7 @@ Build a power diode intake on the network you want to draw from, and a power dio
     <supportedVersions>
         <li>1.6</li>
     </supportedVersions>
-    <modVersion>0.2.0</modVersion>
+    <modVersion>0.2.1</modVersion>
     <modDependencies>
         <li>
             <packageId>brrainz.harmony</packageId>

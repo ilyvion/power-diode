@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Updated README.md, SteamDescription.txt, and About.xml to document the operating modes and mod settings added in 0.2.0.
+
 ## [0.2.0] - 2026-09-16
 
 ### Added

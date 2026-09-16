@@ -25,6 +25,23 @@ destroyed, dropping to 0 W with no errors. If some other wiring elsewhere on
 the map ends up joining the intake's and outlet's networks into one, the
 diode detects the shared grid and disables itself, with an on-map indicator.
 
+## Operating modes
+
+A gizmo on the outlet switches between three operating modes:
+
+- **One-way valve** (default) - feeds power whenever the intake network has
+  surplus power to spare, up to the wattage cap, while keeping the battery
+  reserve untouched on the intake side.
+- **Overflow** - only feeds power once the intake network's batteries are
+  charged above a set percentage threshold; below that it stays off.
+- **Top-up** - only feeds power while the outlet network's batteries are
+  below a set percentage threshold, and stops once they reach it.
+
+Mod settings let you configure the minimum and maximum range for the
+wattage cap and battery reserve sliders, and switch the one-way valve's
+battery reserve to be set as a percentage of the intake network's total
+battery capacity instead of an absolute amount of watt-days.
+
 ## Requirements
 
 - [Harmony](https://steamcommunity.com/workshop/filedetails/?id=2009463077)

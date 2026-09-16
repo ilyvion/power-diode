@@ -14,6 +14,17 @@ The outlet:
 
 Both buildings behave safely on their own - an unpaired or partner-less building just sits at 0 W, with the inspect string telling you why. If some other piece of wiring elsewhere on the map ends up joining the intake's and outlet's networks into one grid, the diode notices the shared connection and disables itself, with an on-map indicator.
 
+[h1]Operating modes[/h1]
+
+A gizmo on the outlet switches between three modes:
+[list]
+[*] [b]One-way valve[/b] (default) - feeds power whenever the intake network has surplus to spare, up to the wattage cap, keeping the battery reserve untouched on the intake side.
+[*] [b]Overflow[/b] - only feeds power once the intake network's batteries are charged above a set percentage threshold.
+[*] [b]Top-up[/b] - only feeds power while the outlet network's batteries are below a set percentage threshold, and stops once they reach it.
+[/list]
+
+Mod settings let you configure the min/max range for the wattage cap and battery reserve sliders, and switch the one-way valve's battery reserve to a percentage of the intake network's total battery capacity instead of an absolute amount of watt-days.
+
 [h1]Why not just merge the networks?[/h1]
 
 A few real ways to use this:

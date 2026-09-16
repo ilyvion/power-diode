@@ -5,7 +5,7 @@
     <author>ilyvion</author>
     <description>Adds a one-way power valve: a pair of buildings that let power flow from one power network to another without merging them.
 
-Build a power diode intake on the network you want to draw from, and a power diode outlet directly adjacent to it, wired into whatever network you want to feed - power only ever flows from the intake's side to the outlet's side, never back the other way. The outlet has a wattage cap slider and a battery reserve slider (to keep some stored energy untouched on the intake's side), and it only ever feeds as much as its own network needs and the intake's network has to spare.</description>
+Build a power diode intake on the network you want to draw from, and a power diode outlet directly adjacent to it, wired into whatever network you want to feed - power only ever flows from the intake's side to the outlet's side, never back the other way. The outlet has a wattage cap slider and a battery reserve slider (to keep some stored energy untouched on the intake's side), and it only ever feeds as much as its own network needs and the intake's network has to spare. A gizmo lets you switch the outlet between the default one-way valve behavior and two threshold-based modes, overflow and top-up.</description>
     <supportedVersions>
         <li>1.6</li>
     </supportedVersions>

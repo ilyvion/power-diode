@@ -4,10 +4,12 @@ namespace PowerDiode;
 
 internal partial class PowerDiodeMod
 {
+    internal static Settings Settings { get; private set; } = null!;
+
     partial void Construct()
     {
         new Harmony(Constants.Id).PatchAll(Assembly.GetExecutingAssembly());
-        _ = GetSettings<Settings>();
+        Settings = GetSettings<Settings>();
     }
 
     public override void DoSettingsWindowContents(Rect inRect)

@@ -13,7 +13,12 @@ internal class CompPowerDiodeFeed : ThingComp
     internal float TargetWatts
     {
         get => targetWatts;
-        set => targetWatts = Mathf.Clamp(value, 0f, Props.maxAllowedWattage);
+        set =>
+            targetWatts = Mathf.Clamp(
+                value,
+                PowerDiodeMod.Settings.MinWattage,
+                PowerDiodeMod.Settings.MaxWattage
+            );
     }
 
     // How many watt-days of stored energy on the draw node's power net batteries are kept
@@ -25,8 +30,8 @@ internal class CompPowerDiodeFeed : ThingComp
         set =>
             reserveWattDays = Mathf.Clamp(
                 value,
-                Props.minReserveWattDays,
-                Props.maxReserveWattDays
+                PowerDiodeMod.Settings.MinReserveWattDays,
+                PowerDiodeMod.Settings.MaxReserveWattDays
             );
     }
 
@@ -57,8 +62,8 @@ internal class CompPowerDiodeFeed : ThingComp
         base.PostSpawnSetup(respawningAfterLoad);
         if (!respawningAfterLoad)
         {
-            targetWatts = Props.maxAllowedWattage;
-            reserveWattDays = Props.minReserveWattDays;
+            targetWatts = PowerDiodeMod.Settings.MaxWattage;
+            reserveWattDays = PowerDiodeMod.Settings.MinReserveWattDays;
         }
         if (Partner == null)
         {
@@ -69,8 +74,12 @@ internal class CompPowerDiodeFeed : ThingComp
     public override void PostExposeData()
     {
         base.PostExposeData();
-        Scribe_Values.Look(ref targetWatts, "targetWatts", Props.maxAllowedWattage);
-        Scribe_Values.Look(ref reserveWattDays, "reserveWattDays", Props.minReserveWattDays);
+        Scribe_Values.Look(ref targetWatts, "targetWatts", PowerDiodeMod.Settings.MaxWattage);
+        Scribe_Values.Look(
+            ref reserveWattDays,
+            "reserveWattDays",
+            PowerDiodeMod.Settings.MinReserveWattDays
+        );
     }
 
     public override void PostDeSpawn(Map map, DestroyMode mode = DestroyMode.Vanish)

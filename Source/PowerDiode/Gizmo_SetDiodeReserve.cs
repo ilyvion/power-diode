@@ -6,18 +6,23 @@ internal class Gizmo_SetDiodeReserve : Gizmo_Slider
 
     private static bool draggingBar;
 
-    private float SliderRangeWattDays =>
-        feed.Props.maxReserveWattDays - feed.Props.minReserveWattDays;
+    private static float SliderRangeWattDays =>
+        PowerDiodeMod.Settings.MaxReserveWattDays - PowerDiodeMod.Settings.MinReserveWattDays;
 
     protected override float Target
     {
-        get => (feed.ReserveWattDays - feed.Props.minReserveWattDays) / SliderRangeWattDays;
-        set => feed.ReserveWattDays = feed.Props.minReserveWattDays + (value * SliderRangeWattDays);
+        get =>
+            (feed.ReserveWattDays - PowerDiodeMod.Settings.MinReserveWattDays)
+            / SliderRangeWattDays;
+        set =>
+            feed.ReserveWattDays =
+                PowerDiodeMod.Settings.MinReserveWattDays + (value * SliderRangeWattDays);
     }
 
     protected override float ValuePercent =>
         Mathf.Clamp01(
-            (feed.SourceBatteryStoredWattDays - feed.Props.minReserveWattDays) / SliderRangeWattDays
+            (feed.SourceBatteryStoredWattDays - PowerDiodeMod.Settings.MinReserveWattDays)
+                / SliderRangeWattDays
         );
 
     protected override string Title => "PowerDiode.ReserveGizmoTitle".Translate();

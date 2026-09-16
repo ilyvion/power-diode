@@ -80,10 +80,7 @@
                 <shortCircuitInRain>true</shortCircuitInRain>
             </li>
             <li Class="PowerDiode.CompProperties_PowerDiodeFeed">
-                <maxAllowedWattage>5000</maxAllowedWattage>
                 <wattageStepSize>25</wattageStepSize>
-                <minReserveWattDays>10</minReserveWattDays>
-                <maxReserveWattDays>500</maxReserveWattDays>
                 <reserveWattDaysStepSize>10</reserveWattDaysStepSize>
             </li>
         </comps>

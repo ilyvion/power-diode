@@ -11,4 +11,10 @@
     <PowerDiode.ReserveGizmoTitle>Battery reserve</PowerDiode.ReserveGizmoTitle>
     <PowerDiode.ReserveBarLabel>{0} Wd</PowerDiode.ReserveBarLabel>
     <PowerDiode.ReserveTooltip>How much stored energy (in watt-days) to keep untouched in batteries on the intake's network. As their total stored energy nears this amount, this outlet feeds less than its wattage cap; once it's reached, batteries are treated as if they have nothing left to give.</PowerDiode.ReserveTooltip>
+    <PowerDiode.Settings.WattageSectionLabel>Wattage cap limits</PowerDiode.Settings.WattageSectionLabel>
+    <PowerDiode.Settings.MinWattage>Minimum wattage cap</PowerDiode.Settings.MinWattage>
+    <PowerDiode.Settings.MaxWattage>Maximum wattage cap</PowerDiode.Settings.MaxWattage>
+    <PowerDiode.Settings.ReserveSectionLabel>Battery reserve limits</PowerDiode.Settings.ReserveSectionLabel>
+    <PowerDiode.Settings.MinReserveWattDays>Minimum battery reserve (Wd)</PowerDiode.Settings.MinReserveWattDays>
+    <PowerDiode.Settings.MaxReserveWattDays>Maximum battery reserve (Wd)</PowerDiode.Settings.MaxReserveWattDays>
 </LanguageData>

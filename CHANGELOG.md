@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Mod settings to configure the minimum and maximum wattage cap and the minimum and maximum battery reserve (Wd) that outlets can be set to, instead of these limits being fixed.
+
 ## [0.1.0] - 2026-09-03
 
 ### Added

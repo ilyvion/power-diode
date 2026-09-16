@@ -15,6 +15,7 @@ internal class Settings : ModSettings
     public float MaxWattage = DefaultMaxWattage;
     public float MinReserveWattDays = DefaultMinReserveWattDays;
     public float MaxReserveWattDays = DefaultMaxReserveWattDays;
+    public bool ReserveIsPercentage;
 
     private static string minWattageBuffer = DefaultMinWattage.ToString(
         CultureInfo.InvariantCulture
@@ -36,6 +37,7 @@ internal class Settings : ModSettings
         Scribe_Values.Look(ref MaxWattage, "maxWattage", DefaultMaxWattage);
         Scribe_Values.Look(ref MinReserveWattDays, "minReserveWattDays", DefaultMinReserveWattDays);
         Scribe_Values.Look(ref MaxReserveWattDays, "maxReserveWattDays", DefaultMaxReserveWattDays);
+        Scribe_Values.Look(ref ReserveIsPercentage, "reserveIsPercentage");
     }
 
     public static void DoSettingsWindowContents(Rect inRect)
@@ -77,6 +79,11 @@ internal class Settings : ModSettings
             ref maxReserveWattDaysBuffer,
             settings.MinReserveWattDays,
             ReserveWattDaysFieldCeiling
+        );
+        listing.CheckboxLabeled(
+            "PowerDiode.Settings.ReserveIsPercentage".Translate(),
+            ref settings.ReserveIsPercentage,
+            "PowerDiode.Settings.ReserveIsPercentageTooltip".Translate()
         );
 
         listing.End();

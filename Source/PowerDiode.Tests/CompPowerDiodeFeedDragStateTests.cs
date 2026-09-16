@@ -34,5 +34,11 @@ internal static class CompPowerDiodeFeedDragStateTests
 
         feedA.draggingWattageBar = true;
         Assert.That(feedB.draggingWattageBar).Is.False();
+
+        feedA.draggingOverflowBar = true;
+        Assert.That(feedB.draggingOverflowBar).Is.False();
+
+        feedA.draggingTopUpBar = true;
+        Assert.That(feedB.draggingTopUpBar).Is.False();
     }
 }

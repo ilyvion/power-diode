@@ -4,36 +4,60 @@ internal class Gizmo_SetDiodeReserve : Gizmo_Slider
 {
     private readonly CompPowerDiodeFeed feed;
 
+    private static bool IsPercentMode => PowerDiodeMod.Settings.ReserveIsPercentage;
+
     private static float SliderRangeWattDays =>
         PowerDiodeMod.Settings.MaxReserveWattDays - PowerDiodeMod.Settings.MinReserveWattDays;
 
     protected override float Target
     {
         get =>
-            (feed.ReserveWattDays - PowerDiodeMod.Settings.MinReserveWattDays)
-            / SliderRangeWattDays;
-        set =>
-            feed.ReserveWattDays =
-                PowerDiodeMod.Settings.MinReserveWattDays + (value * SliderRangeWattDays);
+            IsPercentMode
+                ? feed.ReservePercent / 100f
+                : (feed.ReserveWattDays - PowerDiodeMod.Settings.MinReserveWattDays)
+                    / SliderRangeWattDays;
+        set
+        {
+            if (IsPercentMode)
+            {
+                feed.ReservePercent = value * 100f;
+            }
+            else
+            {
+                feed.ReserveWattDays =
+                    PowerDiodeMod.Settings.MinReserveWattDays + (value * SliderRangeWattDays);
+            }
+        }
     }
 
     protected override float ValuePercent =>
-        Mathf.Clamp01(
-            (feed.SourceBatteryStoredWattDays - PowerDiodeMod.Settings.MinReserveWattDays)
-                / SliderRangeWattDays
-        );
+        IsPercentMode
+            ? feed.SourceBatteryStoredPercent
+            : Mathf.Clamp01(
+                (feed.SourceBatteryStoredWattDays - PowerDiodeMod.Settings.MinReserveWattDays)
+                    / SliderRangeWattDays
+            );
 
     protected override string Title => "PowerDiode.ReserveGizmoTitle".Translate();
 
     protected override bool IsDraggable => true;
 
     protected override string BarLabel =>
-        "PowerDiode.ReserveBarLabel".Translate(
-            feed.ReserveWattDays.ToString("F0", CultureInfo.InvariantCulture)
-        );
+        IsPercentMode
+            ? "PowerDiode.PercentBarLabel".Translate(
+                feed.ReservePercent.ToString("F0", CultureInfo.InvariantCulture)
+            )
+            : "PowerDiode.ReserveBarLabel".Translate(
+                feed.ReserveWattDays.ToString("F0", CultureInfo.InvariantCulture)
+            );
 
     protected override int Increments =>
-        Mathf.Max(1, Mathf.RoundToInt(SliderRangeWattDays / feed.Props.reserveWattDaysStepSize));
+        IsPercentMode
+            ? Mathf.Max(1, Mathf.RoundToInt(100f / feed.Props.percentStepSize))
+            : Mathf.Max(
+                1,
+                Mathf.RoundToInt(SliderRangeWattDays / feed.Props.reserveWattDaysStepSize)
+            );
 
     protected override bool DraggingBar
     {
@@ -46,7 +70,10 @@ internal class Gizmo_SetDiodeReserve : Gizmo_Slider
         this.feed = feed;
     }
 
-    protected override string GetTooltip() => "PowerDiode.ReserveTooltip".Translate();
+    protected override string GetTooltip() =>
+        IsPercentMode
+            ? "PowerDiode.ReservePercentTooltip".Translate()
+            : "PowerDiode.ReserveTooltip".Translate();
 
     // A fresh Gizmo_SetDiodeReserve is created every GUI frame, so the default
     // identity-based hash code changes every frame too. TooltipHandler.TipRegion keys its

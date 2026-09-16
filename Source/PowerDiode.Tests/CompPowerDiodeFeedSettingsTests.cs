@@ -67,4 +67,40 @@ internal static class CompPowerDiodeFeedSettingsTests
             settings.MaxReserveWattDays = originalMax;
         }
     }
+
+    [Test]
+    public static void ReservePercentIsClampedTo0To100()
+    {
+        var feed = MakeFeedComp();
+
+        feed.ReservePercent = -10f;
+        Assert.That(feed.ReservePercent).Is.EqualTo(0f);
+
+        feed.ReservePercent = 150f;
+        Assert.That(feed.ReservePercent).Is.EqualTo(100f);
+    }
+
+    [Test]
+    public static void OverflowThresholdPercentIsClampedTo0To100()
+    {
+        var feed = MakeFeedComp();
+
+        feed.OverflowThresholdPercent = -10f;
+        Assert.That(feed.OverflowThresholdPercent).Is.EqualTo(0f);
+
+        feed.OverflowThresholdPercent = 150f;
+        Assert.That(feed.OverflowThresholdPercent).Is.EqualTo(100f);
+    }
+
+    [Test]
+    public static void TopUpThresholdPercentIsClampedTo0To100()
+    {
+        var feed = MakeFeedComp();
+
+        feed.TopUpThresholdPercent = -10f;
+        Assert.That(feed.TopUpThresholdPercent).Is.EqualTo(0f);
+
+        feed.TopUpThresholdPercent = 150f;
+        Assert.That(feed.TopUpThresholdPercent).Is.EqualTo(100f);
+    }
 }

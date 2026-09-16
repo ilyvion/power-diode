@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Mod settings to configure the minimum and maximum wattage cap and the minimum and maximum battery reserve (Wd) that outlets can be set to, instead of these limits being fixed.
+- Two new outlet operating modes, alongside the existing one-way valve behavior: Overflow, which only feeds power once the intake network's batteries are charged above a set percentage, and Top-up, which only feeds power while the outlet network's batteries are below a set percentage. Switch modes from a new gizmo on the outlet.
+- A mod setting to set the one-way valve battery reserve as a percentage of the intake network's total battery capacity instead of an absolute amount of watt-days.
 
 ### Fixed
 

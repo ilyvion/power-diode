@@ -225,4 +225,154 @@ internal static class PowerDiodeFlowTests
         );
         Assert.That(flow).Is.EqualTo(200f);
     }
+
+    [Test]
+    public static void SourceReserveFloorUsesAbsoluteWattDaysInOneWayValveModeByDefault()
+    {
+        var floor = PowerDiodeFlow.SourceReserveFloorWattDays(
+            mode: PowerDiodeOperatingMode.OneWayValve,
+            reserveWattDays: 50f,
+            reserveIsPercentage: false,
+            reservePercent: 20f,
+            sourceBatteryCapacityWattDays: 1000f
+        );
+        Assert.That(floor).Is.EqualTo(50f);
+    }
+
+    [Test]
+    public static void SourceReserveFloorUsesPercentOfCapacityInOneWayValveModeWhenEnabled()
+    {
+        var floor = PowerDiodeFlow.SourceReserveFloorWattDays(
+            mode: PowerDiodeOperatingMode.OneWayValve,
+            reserveWattDays: 50f,
+            reserveIsPercentage: true,
+            reservePercent: 20f,
+            sourceBatteryCapacityWattDays: 1000f
+        );
+        Assert.That(floor).Is.EqualTo(200f);
+    }
+
+    [Test]
+    public static void SourceReserveFloorIsZeroInOverflowMode()
+    {
+        var floor = PowerDiodeFlow.SourceReserveFloorWattDays(
+            mode: PowerDiodeOperatingMode.Overflow,
+            reserveWattDays: 999f,
+            reserveIsPercentage: false,
+            reservePercent: 999f,
+            sourceBatteryCapacityWattDays: 1000f
+        );
+        Assert.That(floor).Is.EqualTo(0f);
+    }
+
+    [Test]
+    public static void SourceReserveFloorIsZeroInTopUpMode()
+    {
+        var floor = PowerDiodeFlow.SourceReserveFloorWattDays(
+            mode: PowerDiodeOperatingMode.TopUp,
+            reserveWattDays: 50f,
+            reserveIsPercentage: true,
+            reservePercent: 20f,
+            sourceBatteryCapacityWattDays: 1000f
+        );
+        Assert.That(floor).Is.EqualTo(0f);
+    }
+
+    [Test]
+    public static void OverflowGateIsZeroAtOrBelowThreshold()
+    {
+        Assert
+            .That(
+                PowerDiodeFlow.OverflowGateFraction(
+                    capWatts: 500f,
+                    overflowThresholdPercent: 80f,
+                    sourceBatteryStoredWattDays: 800f,
+                    sourceBatteryCapacityWattDays: 1000f
+                )
+            )
+            .Is.EqualTo(0f);
+        Assert
+            .That(
+                PowerDiodeFlow.OverflowGateFraction(
+                    capWatts: 500f,
+                    overflowThresholdPercent: 80f,
+                    sourceBatteryStoredWattDays: 600f,
+                    sourceBatteryCapacityWattDays: 1000f
+                )
+            )
+            .Is.EqualTo(0f);
+    }
+
+    [Test]
+    public static void OverflowGateIsFullyOpenOnceWellAboveThreshold()
+    {
+        var gate = PowerDiodeFlow.OverflowGateFraction(
+            capWatts: 1f,
+            overflowThresholdPercent: 80f,
+            sourceBatteryStoredWattDays: 1000f,
+            sourceBatteryCapacityWattDays: 1000f
+        );
+        Assert.That(gate).Is.EqualTo(1f);
+    }
+
+    [Test]
+    public static void OverflowGateIsZeroWhenCapWattsIsZero()
+    {
+        var gate = PowerDiodeFlow.OverflowGateFraction(
+            capWatts: 0f,
+            overflowThresholdPercent: 80f,
+            sourceBatteryStoredWattDays: 1000f,
+            sourceBatteryCapacityWattDays: 1000f
+        );
+        Assert.That(gate).Is.EqualTo(0f);
+    }
+
+    [Test]
+    public static void TopUpGateIsZeroAtOrAboveThreshold()
+    {
+        Assert
+            .That(
+                PowerDiodeFlow.TopUpGateFraction(
+                    capWatts: 500f,
+                    topUpThresholdPercent: 20f,
+                    sinkBatteryStoredWattDays: 200f,
+                    sinkBatteryCapacityWattDays: 1000f
+                )
+            )
+            .Is.EqualTo(0f);
+        Assert
+            .That(
+                PowerDiodeFlow.TopUpGateFraction(
+                    capWatts: 500f,
+                    topUpThresholdPercent: 20f,
+                    sinkBatteryStoredWattDays: 800f,
+                    sinkBatteryCapacityWattDays: 1000f
+                )
+            )
+            .Is.EqualTo(0f);
+    }
+
+    [Test]
+    public static void TopUpGateIsFullyOpenWhenWellBelowThreshold()
+    {
+        var gate = PowerDiodeFlow.TopUpGateFraction(
+            capWatts: 1f,
+            topUpThresholdPercent: 20f,
+            sinkBatteryStoredWattDays: 0f,
+            sinkBatteryCapacityWattDays: 1000f
+        );
+        Assert.That(gate).Is.EqualTo(1f);
+    }
+
+    [Test]
+    public static void TopUpGateIsZeroWhenCapWattsIsZero()
+    {
+        var gate = PowerDiodeFlow.TopUpGateFraction(
+            capWatts: 0f,
+            topUpThresholdPercent: 20f,
+            sinkBatteryStoredWattDays: 0f,
+            sinkBatteryCapacityWattDays: 1000f
+        );
+        Assert.That(gate).Is.EqualTo(0f);
+    }
 }

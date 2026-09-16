@@ -45,4 +45,8 @@ internal class Gizmo_SetDiodeWattage : Gizmo_Slider
     }
 
     protected override string GetTooltip() => "PowerDiode.WattageCapTooltip".Translate();
+
+    // See Gizmo_SetDiodeReserve.GetHashCode for why this override is needed.
+    public override int GetHashCode() =>
+        HashCode.Combine(typeof(Gizmo_SetDiodeWattage), feed.parent.thingIDNumber);
 }

@@ -49,4 +49,12 @@ internal class Gizmo_SetDiodeReserve : Gizmo_Slider
     }
 
     protected override string GetTooltip() => "PowerDiode.ReserveTooltip".Translate();
+
+    // A fresh Gizmo_SetDiodeReserve is created every GUI frame, so the default
+    // identity-based hash code changes every frame too. TooltipHandler.TipRegion keys its
+    // hover-delay tracking by this hash, so a changing value means the tooltip's initial
+    // delay never elapses and it never shows. Deriving from the feed's parent instead keeps
+    // it stable across frames.
+    public override int GetHashCode() =>
+        HashCode.Combine(typeof(Gizmo_SetDiodeReserve), feed.parent.thingIDNumber);
 }

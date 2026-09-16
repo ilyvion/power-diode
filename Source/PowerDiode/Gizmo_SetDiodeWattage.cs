@@ -4,8 +4,6 @@ internal class Gizmo_SetDiodeWattage : Gizmo_Slider
 {
     private readonly CompPowerDiodeFeed feed;
 
-    private static bool draggingBar;
-
     private static float SliderRangeWatts =>
         PowerDiodeMod.Settings.MaxWattage - PowerDiodeMod.Settings.MinWattage;
 
@@ -35,8 +33,8 @@ internal class Gizmo_SetDiodeWattage : Gizmo_Slider
 
     protected override bool DraggingBar
     {
-        get => draggingBar;
-        set => draggingBar = value;
+        get => feed.draggingWattageBar;
+        set => feed.draggingWattageBar = value;
     }
 
     internal Gizmo_SetDiodeWattage(CompPowerDiodeFeed feed)

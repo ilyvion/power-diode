@@ -4,8 +4,6 @@ internal class Gizmo_SetDiodeReserve : Gizmo_Slider
 {
     private readonly CompPowerDiodeFeed feed;
 
-    private static bool draggingBar;
-
     private static float SliderRangeWattDays =>
         PowerDiodeMod.Settings.MaxReserveWattDays - PowerDiodeMod.Settings.MinReserveWattDays;
 
@@ -39,8 +37,8 @@ internal class Gizmo_SetDiodeReserve : Gizmo_Slider
 
     protected override bool DraggingBar
     {
-        get => draggingBar;
-        set => draggingBar = value;
+        get => feed.draggingReserveBar;
+        set => feed.draggingReserveBar = value;
     }
 
     internal Gizmo_SetDiodeReserve(CompPowerDiodeFeed feed)

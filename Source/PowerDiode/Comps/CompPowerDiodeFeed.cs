@@ -6,6 +6,11 @@ internal class CompPowerDiodeFeed : ThingComp
     private float targetWatts;
     private float reserveWattDays;
 
+    // Gizmo_SetDiodeWattage/Gizmo_SetDiodeReserve are recreated every GUI frame, so their
+    // drag state can't live on the gizmo itself; it's kept here instead, per building.
+    internal bool draggingWattageBar;
+    internal bool draggingReserveBar;
+
     internal CompPowerDiodeDraw? Partner { get; set; }
 
     internal CompProperties_PowerDiodeFeed Props => (CompProperties_PowerDiodeFeed)props;

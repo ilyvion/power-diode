@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The wattage cap and battery reserve sliders now show their tooltips when hovered.
 - Dragging one selected diode outlet's wattage cap or battery reserve slider no longer visually disturbs the same slider on other selected outlets.
+- Changing the wattage cap or battery reserve (Wd) limits in mod settings can no longer silently change an outlet's already-configured wattage cap or battery reserve if it happened to have the default value set.
 
 ## [0.1.0] - 2026-09-03
 

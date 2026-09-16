@@ -144,11 +144,17 @@ internal class CompPowerDiodeFeed : ThingComp
     public override void PostExposeData()
     {
         base.PostExposeData();
-        Scribe_Values.Look(ref targetWatts, "targetWatts", PowerDiodeMod.Settings.MaxWattage);
+        Scribe_Values.Look(
+            ref targetWatts,
+            "targetWatts",
+            PowerDiodeMod.Settings.MaxWattage,
+            forceSave: true
+        );
         Scribe_Values.Look(
             ref reserveWattDays,
             "reserveWattDays",
-            PowerDiodeMod.Settings.MinReserveWattDays
+            PowerDiodeMod.Settings.MinReserveWattDays,
+            forceSave: true
         );
         Scribe_Values.Look(ref reservePercent, "reservePercent", DefaultReservePercent);
         Scribe_Values.Look(

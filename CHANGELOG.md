@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A power diode outlet's inspect text now says it is receiving power from its intake, rather than wrongly saying it is feeding the intake.
 - A power diode intake or outlet placed next to both an already-paired diode building and an unpaired one now pairs with the unpaired one. Previously it could stay unpaired and log an error. An intake placed next to only an already-paired outlet now simply stays unpaired, without logging an error.
 - Loading a save no longer changes which power diode intakes and outlets are paired. Previously an unpaired intake and outlet next to each other could pair up on load, and a building could come back paired with a different neighbour than before.
+- The game no longer logs a warning about Power Diode's gizmo icons not being loaded on the main thread when it starts.
 
 ## [0.2.1] - 2026-09-16
 

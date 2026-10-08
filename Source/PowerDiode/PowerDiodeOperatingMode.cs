@@ -9,22 +9,12 @@ internal enum PowerDiodeOperatingMode
 
 internal static class PowerDiodeOperatingModeExtensions
 {
-    private static readonly Texture2D OneWayValveIcon = ContentFinder<Texture2D>.Get(
-        "UI/Commands/PWDIconModeOneWayValve"
-    );
-    private static readonly Texture2D OverflowIcon = ContentFinder<Texture2D>.Get(
-        "UI/Commands/PWDIconModeOverflow"
-    );
-    private static readonly Texture2D TopUpIcon = ContentFinder<Texture2D>.Get(
-        "UI/Commands/PWDIconModeTopUp"
-    );
-
     internal static Texture2D Icon(this PowerDiodeOperatingMode mode) =>
         mode switch
         {
-            PowerDiodeOperatingMode.OneWayValve => OneWayValveIcon,
-            PowerDiodeOperatingMode.Overflow => OverflowIcon,
-            PowerDiodeOperatingMode.TopUp => TopUpIcon,
+            PowerDiodeOperatingMode.OneWayValve => Resources.ModeOneWayValveIcon,
+            PowerDiodeOperatingMode.Overflow => Resources.ModeOverflowIcon,
+            PowerDiodeOperatingMode.TopUp => Resources.ModeTopUpIcon,
             _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null),
         };
 

@@ -4,10 +4,6 @@ namespace PowerDiode;
 // since pairing only happens automatically when a diode building spawns.
 internal static class PowerDiodeLinkGizmo
 {
-    private static readonly Texture2D Icon = ContentFinder<Texture2D>.Get(
-        "UI/Commands/PWDIconLinkNeighbour"
-    );
-
     internal static Command_Action? Create<T>(
         Thing self,
         List<T> candidates,
@@ -22,7 +18,7 @@ internal static class PowerDiodeLinkGizmo
             {
                 defaultLabel = label,
                 defaultDesc = description,
-                icon = Icon,
+                icon = Resources.LinkNeighbourIcon,
                 onHover = () =>
                 {
                     foreach (var candidate in candidates)

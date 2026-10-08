@@ -6,7 +6,7 @@ internal static class PowerDiodeLinking
     {
         // Only unpaired intakes are candidates, so dev-mode placement, which bypasses
         // PlaceWorker checks, can never double-pair an intake.
-        var draw = FindAdjacent<CompPowerDiodeDraw>(feed.parent, d => d.Partner == null);
+        var draw = FindDrawNodeToLinkTo(feed.parent.Position, feed.parent.Map);
         if (draw != null)
         {
             Link(draw, feed);
@@ -15,7 +15,7 @@ internal static class PowerDiodeLinking
 
     internal static void TryLinkDrawNode(CompPowerDiodeDraw draw)
     {
-        var feed = FindAdjacent<CompPowerDiodeFeed>(draw.parent, f => f.Partner == null);
+        var feed = FindFeedNodeToLinkTo(draw.parent.Position, draw.parent.Map);
         if (feed != null)
         {
             Link(draw, feed);
@@ -28,13 +28,47 @@ internal static class PowerDiodeLinking
         feed.Partner = draw;
     }
 
-    internal static T? FindAdjacent<T>(Thing thing, Predicate<T> validator)
+    // The building a diode of the given def would pair with if it spawned at cell. When
+    // reinstalling, movingThing is the building being moved, which stays paired with its current
+    // partner until it's uninstalled, so that partner counts as unpaired.
+    internal static Thing? FindPartnerToLinkTo(
+        ThingDef def,
+        IntVec3 cell,
+        Map map,
+        Thing? movingThing = null
+    ) =>
+        def.HasComp<CompPowerDiodeDraw>() ? FindFeedNodeToLinkTo(cell, map, movingThing)?.parent
+        : def.HasComp<CompPowerDiodeFeed>() ? FindDrawNodeToLinkTo(cell, map, movingThing)?.parent
+        : null;
+
+    internal static CompPowerDiodeDraw? FindDrawNodeToLinkTo(
+        IntVec3 cell,
+        Map map,
+        Thing? movingThing = null
+    ) =>
+        FindAdjacent<CompPowerDiodeDraw>(
+            cell,
+            map,
+            d => d.Partner == null || d.Partner.parent == movingThing
+        );
+
+    internal static CompPowerDiodeFeed? FindFeedNodeToLinkTo(
+        IntVec3 cell,
+        Map map,
+        Thing? movingThing = null
+    ) =>
+        FindAdjacent<CompPowerDiodeFeed>(
+            cell,
+            map,
+            f => f.Partner == null || f.Partner.parent == movingThing
+        );
+
+    private static T? FindAdjacent<T>(IntVec3 center, Map map, Predicate<T> validator)
         where T : ThingComp
     {
-        var map = thing.Map;
         foreach (var dir in GenAdj.CardinalDirections)
         {
-            var cell = thing.Position + dir;
+            var cell = center + dir;
             if (!cell.InBounds(map))
             {
                 continue;

@@ -41,6 +41,11 @@
             </li>
             <li Class="PowerDiode.CompProperties_PowerDiodeDraw" />
         </comps>
+        <placeWorkers>
+            <li>PowerDiode.PlaceWorker_ShowDiodeLink</li>
+        </placeWorkers>
+        <drawPlaceWorkersWhileSelected>true</drawPlaceWorkersWhileSelected>
+        <drawPlaceWorkersWhileInstallBlueprintSelected>true</drawPlaceWorkersWhileInstallBlueprintSelected>
         <designationCategory>Power</designationCategory>
         <designatorDropdown>PowerDiode_Intakes</designatorDropdown>
         <constructEffect>ConstructMetal</constructEffect>
@@ -95,7 +100,10 @@
         </comps>
         <placeWorkers>
             <li>PowerDiode.PlaceWorker_PowerDiodeFeed</li>
+            <li>PowerDiode.PlaceWorker_ShowDiodeLink</li>
         </placeWorkers>
+        <drawPlaceWorkersWhileSelected>true</drawPlaceWorkersWhileSelected>
+        <drawPlaceWorkersWhileInstallBlueprintSelected>true</drawPlaceWorkersWhileInstallBlueprintSelected>
         <designationCategory>Power</designationCategory>
         <designatorDropdown>PowerDiode_Outlets</designatorDropdown>
         <constructEffect>ConstructMetal</constructEffect>

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Wall-mounted power diode intakes and outlets, built into an existing wall to save space in compact setups. They work like the regular ones, take the place of a power conduit running under the wall, and can be paired with either variant. Each variant is in the same build menu dropdown as its regular counterpart.
 - Power diode intakes and outlets, including the wall-mounted ones, can now be uninstalled and reinstalled elsewhere. A reinstalled outlet keeps its settings, and like a newly built one, it can only be installed directly next to an unpaired intake.
+- While placing or installing a power diode intake or outlet, a line shows which building it will pair with. The line also shows when a placed blueprint or frame is selected.
 
 ### Fixed
 

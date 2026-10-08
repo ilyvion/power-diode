@@ -14,7 +14,7 @@ The outlet:
 
 Both buildings behave safely on their own - an unpaired or partner-less building just sits at 0 W, with the inspect string telling you why. If some other piece of wiring elsewhere on the map ends up joining the intake's and outlet's networks into one grid, the diode notices the shared connection and disables itself, with an on-map indicator.
 
-Both buildings also come in [b]wall-mounted[/b] variants, built into an existing wall to save space in compact setups. Any intake can pair with any outlet.
+Both buildings also come in [b]wall-mounted[/b] variants, built into an existing wall to save space in compact setups. Any intake can pair with any outlet. All of them can be uninstalled and reinstalled elsewhere.
 
 [h1]Operating modes[/h1]
 

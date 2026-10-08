@@ -17,6 +17,10 @@
         <fillPercent>0.5</fillPercent>
         <useHitPoints>true</useHitPoints>
         <tickerType>Normal</tickerType>
+        <minifiedDef>MinifiedThing</minifiedDef>
+        <thingCategories>
+            <li>BuildingsPower</li>
+        </thingCategories>
         <statBases>
             <MaxHitPoints>100</MaxHitPoints>
             <WorkToBuild>800</WorkToBuild>
@@ -62,6 +66,10 @@
         <fillPercent>0.5</fillPercent>
         <useHitPoints>true</useHitPoints>
         <tickerType>Normal</tickerType>
+        <minifiedDef>MinifiedThing</minifiedDef>
+        <thingCategories>
+            <li>BuildingsPower</li>
+        </thingCategories>
         <statBases>
             <MaxHitPoints>100</MaxHitPoints>
             <WorkToBuild>800</WorkToBuild>

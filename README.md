@@ -28,6 +28,7 @@ diode detects the shared grid and disables itself, with an on-map indicator.
 
 Both buildings also come in wall-mounted variants, built into an existing
 wall to save space in compact setups. Any intake can pair with any outlet.
+All of them can be uninstalled and reinstalled elsewhere.
 
 ## Operating modes
 

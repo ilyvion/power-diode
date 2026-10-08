@@ -123,18 +123,21 @@ internal class CompPowerDiodeFeed : ThingComp
         }
     }
 
+    // Defaults are set once, when the comp is created, so a reinstalled outlet keeps its settings.
+    public override void Initialize(CompProperties props)
+    {
+        base.Initialize(props);
+        targetWatts = PowerDiodeMod.Settings.MaxWattage;
+        reserveWattDays = PowerDiodeMod.Settings.MinReserveWattDays;
+        reservePercent = DefaultReservePercent;
+        overflowThresholdPercent = DefaultOverflowThresholdPercent;
+        topUpThresholdPercent = DefaultTopUpThresholdPercent;
+        operatingMode = PowerDiodeOperatingMode.OneWayValve;
+    }
+
     public override void PostSpawnSetup(bool respawningAfterLoad)
     {
         base.PostSpawnSetup(respawningAfterLoad);
-        if (!respawningAfterLoad)
-        {
-            targetWatts = PowerDiodeMod.Settings.MaxWattage;
-            reserveWattDays = PowerDiodeMod.Settings.MinReserveWattDays;
-            reservePercent = DefaultReservePercent;
-            overflowThresholdPercent = DefaultOverflowThresholdPercent;
-            topUpThresholdPercent = DefaultTopUpThresholdPercent;
-            operatingMode = PowerDiodeOperatingMode.OneWayValve;
-        }
         if (Partner == null)
         {
             PowerDiodeLinking.TryLinkFeedNode(this);

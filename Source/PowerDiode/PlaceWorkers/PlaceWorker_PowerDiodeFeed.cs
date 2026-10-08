@@ -25,7 +25,9 @@ internal class PlaceWorker_PowerDiodeFeed : PlaceWorker
                     continue;
                 }
                 var draw = thingWithComps.GetComp<CompPowerDiodeDraw>();
-                if (draw != null && draw.Partner == null)
+                // When reinstalling, thingToIgnore is the outlet being moved, which stays paired
+                // with its current intake until it's uninstalled.
+                if (draw != null && (draw.Partner == null || draw.Partner.parent == thingToIgnore))
                 {
                     return true;
                 }

@@ -67,18 +67,19 @@ internal static class PowerDiodeFlow
     }
 
     // Vanilla PowerNet only switches a consumer on once its network already has the surplus to
-    // cover it, and a switched-off consumer doesn't count towards sinkNetBalanceExclSelf, so on its
-    // own the diode would never feed it. Returns sinkNetBalanceExclSelf less the draw of each
-    // switched-off consumer, smallest first, for as long as restartSupplyWatts still covers the
-    // resulting deficit; a consumer the supply can't fully cover is left out rather than fed power
-    // it can never switch on with.
-    public static float SinkBalanceWithStartableConsumers(
-        float sinkNetBalanceExclSelf,
+    // cover it, and a switched-off consumer doesn't count towards a net balance, so without this
+    // the diode would neither feed a switched-off consumer on its sink network nor leave room for
+    // one on its source network. Returns netBalanceExclSelf less the draw of each switched-off
+    // consumer, smallest first, for as long as restartSupplyWatts still covers the resulting
+    // deficit; a consumer the supply can't fully cover is left out rather than given power it can
+    // never switch on with.
+    public static float BalanceWithStartableConsumers(
+        float netBalanceExclSelf,
         IEnumerable<float> switchedOffDrawWatts,
         float restartSupplyWatts
     )
     {
-        var balance = sinkNetBalanceExclSelf;
+        var balance = netBalanceExclSelf;
         foreach (var drawWatts in switchedOffDrawWatts.OrderBy(watts => watts))
         {
             if (drawWatts - balance > restartSupplyWatts)
@@ -107,6 +108,17 @@ internal static class PowerDiodeFlow
                 ? reservePercent / 100f * sourceBatteryCapacityWattDays
                 : reserveWattDays
             : 0f;
+
+    // Vanilla PowerNet doesn't switch anything on while its batteries hold at least 0.1 Wd but
+    // less than PowerNet.MinStoredEnergyToTurnOn, so while a switched-off consumer on the source
+    // network is waiting to be switched on, the source batteries are kept at or above that.
+    public static float SourceReserveFloorWithWaitingConsumersWattDays(
+        float reserveFloorWattDays,
+        bool sourceHasWaitingConsumers
+    ) =>
+        sourceHasWaitingConsumers
+            ? Math.Max(reserveFloorWattDays, PowerNet.MinStoredEnergyToTurnOn)
+            : reserveFloorWattDays;
 
     // Overflow mode's whole-flow gate: 0 while the source network's batteries are at or below the
     // threshold percentage of their capacity, ramping up to 1 over the final

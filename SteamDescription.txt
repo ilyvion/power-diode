@@ -8,11 +8,13 @@ The outlet:
 [list]
 [*] has a [b]wattage cap[/b] slider, and never feeds more than that,
 [*] never feeds more than its own network currently needs, including charging batteries,
-[*] never feeds more than the intake's network currently has to spare, so it can't drag your main grid into a brownout to top off a side project,
+[*] never feeds more than the intake's network currently has to spare, so it can't drag your main grid into a brownout to top off a side project, and leaves enough for that grid's own devices that are waiting for power to switch back on,
 [*] has a [b]battery reserve[/b] slider, letting you protect a chosen amount of stored energy (in watt-days) in batteries on the intake's side, so the diode tapers off and stops instead of draining a backup bank dry.
 [/list]
 
 Both buildings behave safely on their own - an unpaired or partner-less building just sits at 0 W, with the inspect string telling you why. If some other piece of wiring elsewhere on the map ends up joining the intake's and outlet's networks into one grid, the diode notices the shared connection and disables itself, with an on-map indicator.
+
+Both buildings also come in [b]wall-mounted[/b] variants, built into an existing wall to save space in compact setups. Any intake can pair with any outlet.
 
 [h1]Operating modes[/h1]
 

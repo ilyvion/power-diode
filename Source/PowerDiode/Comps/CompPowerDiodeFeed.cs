@@ -238,7 +238,14 @@ internal class CompPowerDiodeFeed : ThingComp
         }
         IsSharedGridDegenerate = false;
 
-        var sourceBalanceExclSelf = NetBalanceExcluding(sourceNet, partner.PowerTrader);
+        // The source network's own switched-off consumers come first: surplus that covers them is
+        // left for vanilla to switch them on with.
+        var sourceRawBalanceExclSelf = NetBalanceExcluding(sourceNet, partner.PowerTrader);
+        var sourceBalanceExclSelf = PowerDiodeFlow.BalanceWithStartableConsumers(
+            sourceRawBalanceExclSelf,
+            SwitchedOffDrawWatts(sourceNet, partner.PowerTrader),
+            0f
+        );
         var sinkAcceptWattDays = sinkNet.batteryComps.Sum(battery =>
             Math.Max(0f, battery.AmountCanAccept)
         );
@@ -255,13 +262,17 @@ internal class CompPowerDiodeFeed : ThingComp
             battery.Props.storedEnergyMax
         );
 
-        var sourceReserveFloorWattDays = PowerDiodeFlow.SourceReserveFloorWattDays(
-            OperatingMode,
-            ReserveWattDays,
-            PowerDiodeMod.Settings.ReserveIsPercentage,
-            ReservePercent,
-            SourceBatteryCapacityWattDays
-        );
+        var sourceReserveFloorWattDays =
+            PowerDiodeFlow.SourceReserveFloorWithWaitingConsumersWattDays(
+                PowerDiodeFlow.SourceReserveFloorWattDays(
+                    OperatingMode,
+                    ReserveWattDays,
+                    PowerDiodeMod.Settings.ReserveIsPercentage,
+                    ReservePercent,
+                    SourceBatteryCapacityWattDays
+                ),
+                sourceBalanceExclSelf < sourceRawBalanceExclSelf
+            );
 
         var sinkBatteryHeadroomWatts = PowerDiodeFlow.BatterySustainableWatts(sinkAcceptWattDays);
         var sourceBatteryReserveWatts = PowerDiodeFlow.BatterySustainableWatts(
@@ -282,7 +293,7 @@ internal class CompPowerDiodeFeed : ThingComp
             sourceBalanceExclSelf,
             sourceBatteryRestartWatts
         );
-        var sinkBalanceExclSelf = PowerDiodeFlow.SinkBalanceWithStartableConsumers(
+        var sinkBalanceExclSelf = PowerDiodeFlow.BalanceWithStartableConsumers(
             NetBalanceExcluding(sinkNet, PowerTrader),
             SwitchedOffDrawWatts(sinkNet, PowerTrader),
             restartSupplyWatts

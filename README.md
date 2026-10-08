@@ -14,7 +14,8 @@ way. The outlet:
 - never feeds more than its network currently needs, including charging
   batteries,
 - never feeds more than the intake's network currently has to spare, so it
-  can't drag the source network into a brownout,
+  can't drag the source network into a brownout, and leaves enough for that
+  network's own devices that are waiting for power to switch back on,
 - has a battery reserve slider, letting you keep a configured amount of
   stored energy (in watt-days) untouched in batteries on the intake's
   network, so the diode won't drain a backup battery bank dry to feed
@@ -24,6 +25,9 @@ Both buildings behave safely when unpaired or when their partner is
 destroyed, dropping to 0 W with no errors. If some other wiring elsewhere on
 the map ends up joining the intake's and outlet's networks into one, the
 diode detects the shared grid and disables itself, with an on-map indicator.
+
+Both buildings also come in wall-mounted variants, built into an existing
+wall to save space in compact setups. Any intake can pair with any outlet.
 
 ## Operating modes
 

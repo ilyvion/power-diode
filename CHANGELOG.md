@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Power diode outlets now power consumers on their network even when that network has no battery or other power source. Previously such consumers stayed off for good, including after a brief power shortage on the intake side. A consumer that loses power because the intake side ran low only switches back on once the intake side can cover it again, so it doesn't keep flicking on and off.
+- Devices on a power diode intake's network that are waiting for power, such as newly built ones or ones that lost power, now switch on as long as that network's own power covers them. Previously the diode could take all of the spare power for the outlet side, leaving them off. While such a device is waiting, the diode also stops drawing from the intake network's batteries once they're down to 5 Wd, the charge they need before anything can switch on.
 
 ## [0.2.1] - 2026-09-16
 

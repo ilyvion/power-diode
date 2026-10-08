@@ -3,4 +3,7 @@
         <RootNamespace>PowerDiode</RootNamespace>
         <AssemblyName>PowerDiode</AssemblyName>
     </PropertyGroup>
+    <ItemGroup>
+        <Publicize Include="Assembly-CSharp:RimWorld.PowerNet.MinStoredEnergyToTurnOn" />
+    </ItemGroup>
 </Project>

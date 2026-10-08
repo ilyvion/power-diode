@@ -374,8 +374,8 @@ internal sealed class PowerDiodeFlowTests
     [Test]
     public static void SwitchedOffConsumerCountsAsDemandWhenSupplyCoversIt()
     {
-        var balance = PowerDiodeFlow.SinkBalanceWithStartableConsumers(
-            sinkNetBalanceExclSelf: 0f,
+        var balance = PowerDiodeFlow.BalanceWithStartableConsumers(
+            netBalanceExclSelf: 0f,
             switchedOffDrawWatts: [30f],
             restartSupplyWatts: 100f
         );
@@ -385,8 +385,8 @@ internal sealed class PowerDiodeFlowTests
     [Test]
     public static void SwitchedOffConsumerIsLeftOutWhenSupplyCannotCoverIt()
     {
-        var balance = PowerDiodeFlow.SinkBalanceWithStartableConsumers(
-            sinkNetBalanceExclSelf: -50f,
+        var balance = PowerDiodeFlow.BalanceWithStartableConsumers(
+            netBalanceExclSelf: -50f,
             switchedOffDrawWatts: [60f],
             restartSupplyWatts: 100f
         );
@@ -396,8 +396,8 @@ internal sealed class PowerDiodeFlowTests
     [Test]
     public static void SwitchedOffConsumersAreAddedSmallestFirstWhileSupplyLasts()
     {
-        var balance = PowerDiodeFlow.SinkBalanceWithStartableConsumers(
-            sinkNetBalanceExclSelf: 0f,
+        var balance = PowerDiodeFlow.BalanceWithStartableConsumers(
+            netBalanceExclSelf: 0f,
             switchedOffDrawWatts: [80f, 30f, 40f],
             restartSupplyWatts: 100f
         );
@@ -407,12 +407,77 @@ internal sealed class PowerDiodeFlowTests
     [Test]
     public static void SinkSurplusCountsTowardsSwitchedOffConsumers()
     {
-        var balance = PowerDiodeFlow.SinkBalanceWithStartableConsumers(
-            sinkNetBalanceExclSelf: 50f,
+        var balance = PowerDiodeFlow.BalanceWithStartableConsumers(
+            netBalanceExclSelf: 50f,
             switchedOffDrawWatts: [120f],
             restartSupplyWatts: 70f
         );
         Expect.AreEqual(-70f, balance);
+    }
+
+    // The source side holds back its own surplus, with no further supply, for switched-off
+    // consumers it can fully cover.
+    [Test]
+    public static void SourceSurplusIsHeldBackForSwitchedOffConsumersItCovers()
+    {
+        var balance = PowerDiodeFlow.BalanceWithStartableConsumers(
+            netBalanceExclSelf: 100f,
+            switchedOffDrawWatts: [60f, 30f],
+            restartSupplyWatts: 0f
+        );
+        Expect.AreEqual(10f, balance);
+    }
+
+    [Test]
+    public static void SourceSurplusIsNotHeldBackForSwitchedOffConsumerItCannotCover()
+    {
+        var balance = PowerDiodeFlow.BalanceWithStartableConsumers(
+            netBalanceExclSelf: 500f,
+            switchedOffDrawWatts: [2000f],
+            restartSupplyWatts: 0f
+        );
+        Expect.AreEqual(500f, balance);
+    }
+
+    [Test]
+    public static void SourceDeficitHoldsBackNothing()
+    {
+        var balance = PowerDiodeFlow.BalanceWithStartableConsumers(
+            netBalanceExclSelf: -20f,
+            switchedOffDrawWatts: [10f],
+            restartSupplyWatts: 0f
+        );
+        Expect.AreEqual(-20f, balance);
+    }
+
+    [Test]
+    public static void SourceReserveFloorIsRaisedToVanillaSwitchOnChargeWhileConsumersWait()
+    {
+        var floor = PowerDiodeFlow.SourceReserveFloorWithWaitingConsumersWattDays(
+            reserveFloorWattDays: 2f,
+            sourceHasWaitingConsumers: true
+        );
+        Expect.AreEqual(5f, floor);
+    }
+
+    [Test]
+    public static void SourceReserveFloorAboveVanillaSwitchOnChargeIsKeptWhileConsumersWait()
+    {
+        var floor = PowerDiodeFlow.SourceReserveFloorWithWaitingConsumersWattDays(
+            reserveFloorWattDays: 50f,
+            sourceHasWaitingConsumers: true
+        );
+        Expect.AreEqual(50f, floor);
+    }
+
+    [Test]
+    public static void SourceReserveFloorIsUnchangedWithNoWaitingConsumers()
+    {
+        var floor = PowerDiodeFlow.SourceReserveFloorWithWaitingConsumersWattDays(
+            reserveFloorWattDays: 2f,
+            sourceHasWaitingConsumers: false
+        );
+        Expect.AreEqual(2f, floor);
     }
 
     [Test]

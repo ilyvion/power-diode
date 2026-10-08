@@ -590,4 +590,55 @@ internal sealed class PowerDiodeFlowTests
         );
         Expect.AreEqual(0f, gate);
     }
+
+    // An Overflow outlet whose intake network has no batteries never feeds, however much
+    // generator surplus that network has.
+    [Test]
+    public static void OverflowGateIsZeroWithNoSourceBatteries()
+    {
+        var gate = PowerDiodeFlow.OverflowGateFraction(
+            capWatts: 500f,
+            overflowThresholdPercent: 80f,
+            sourceBatteryStoredWattDays: 0f,
+            sourceBatteryCapacityWattDays: 0f
+        );
+        Expect.AreEqual(0f, gate);
+    }
+
+    [Test]
+    public static void OverflowGateIsZeroAtZeroThresholdWithEmptyBattery()
+    {
+        var gate = PowerDiodeFlow.OverflowGateFraction(
+            capWatts: 500f,
+            overflowThresholdPercent: 0f,
+            sourceBatteryStoredWattDays: 0f,
+            sourceBatteryCapacityWattDays: 1000f
+        );
+        Expect.AreEqual(0f, gate);
+    }
+
+    // A Top-up outlet whose own network has no batteries never feeds that network's consumers.
+    [Test]
+    public static void TopUpGateIsZeroWithNoSinkBatteries()
+    {
+        var gate = PowerDiodeFlow.TopUpGateFraction(
+            capWatts: 500f,
+            topUpThresholdPercent: 20f,
+            sinkBatteryStoredWattDays: 0f,
+            sinkBatteryCapacityWattDays: 0f
+        );
+        Expect.AreEqual(0f, gate);
+    }
+
+    [Test]
+    public static void TopUpGateIsZeroAtZeroThresholdWithEmptyBattery()
+    {
+        var gate = PowerDiodeFlow.TopUpGateFraction(
+            capWatts: 500f,
+            topUpThresholdPercent: 0f,
+            sinkBatteryStoredWattDays: 0f,
+            sinkBatteryCapacityWattDays: 1000f
+        );
+        Expect.AreEqual(0f, gate);
+    }
 }

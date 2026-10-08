@@ -15,7 +15,10 @@ internal static class PowerDiodeConnectorOverlay
     {
         var rotation = Rot4.FromIntVec3(partnerOffset);
         var drawPos = parent.DrawPos;
-        drawPos.y = AltitudeLayer.BuildingOnTop.AltitudeFor();
+        drawPos.y = Math.Max(
+            AltitudeLayer.BuildingOnTop.AltitudeFor(),
+            parent.def.altitudeLayer.AltitudeFor(1f)
+        );
 
         var size = parent.Graphic.drawSize;
         var mesh = MeshPool.GridPlane(size);

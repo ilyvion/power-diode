@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- wall-mounted power diode outlet: hatch set flush into the top of a wall, seen from directly
+       above, with two SMD capacitors lying in its opening -->
+  <defs>
+    <g id="capacitor">
+      <!-- ceramic body -->
+      <rect x="11" y="1" width="38" height="14" fill="#A09787"/>
+      <!-- metal end caps -->
+      <rect x="0" y="0" width="12" height="16" rx="2" fill="#A7AFB8"/>
+      <rect x="48" y="0" width="12" height="16" rx="2" fill="#A7AFB8"/>
+    </g>
+  </defs>
+  <!-- silhouette outline, doubling as the seam between hatch and wall -->
+  <rect x="18" y="18" width="92" height="92" rx="5" fill="#000"/>
+  <!-- hatch plate -->
+  <rect x="21" y="21" width="86" height="86" rx="3" fill="#5A6572"/>
+  <!-- mounting screws -->
+  <g fill="#2E343B">
+    <circle cx="28" cy="28" r="3.5"/>
+    <circle cx="100" cy="28" r="3.5"/>
+    <circle cx="28" cy="100" r="3.5"/>
+    <circle cx="100" cy="100" r="3.5"/>
+  </g>
+  <!-- status lamp -->
+  <rect x="59" y="97" width="10" height="5" rx="1" fill="#B89A4E"/>
+  <!-- opening -->
+  <rect x="32" y="34" width="64" height="58" rx="2" fill="#33373C"/>
+  <!-- capacitors -->
+  <use href="#capacitor" x="34" y="42"/>
+  <use href="#capacitor" x="34" y="68"/>
+</svg>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+    <DesignatorDropdownGroupDef>
+        <defName>PowerDiode_Intakes</defName>
+        <label>power diode intake</label>
+    </DesignatorDropdownGroupDef>
+
+    <DesignatorDropdownGroupDef>
+        <defName>PowerDiode_Outlets</defName>
+        <label>power diode outlet</label>
+    </DesignatorDropdownGroupDef>
+</Defs>

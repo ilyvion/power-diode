@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
-    <ThingDef ParentName="BuildingBase">
+    <ThingDef ParentName="BuildingBase" Name="PowerDiode_DrawNode">
         <defName>PowerDiode_DrawNode</defName>
         <label>power diode intake</label>
         <description>Draws power from this network on behalf of a paired power diode outlet, up to whatever the outlet's wattage cap and its own network's surplus allow. Draws nothing when unpaired, or when its paired outlet isn't feeding.</description>
@@ -38,13 +38,14 @@
             <li Class="PowerDiode.CompProperties_PowerDiodeDraw" />
         </comps>
         <designationCategory>Power</designationCategory>
+        <designatorDropdown>PowerDiode_Intakes</designatorDropdown>
         <constructEffect>ConstructMetal</constructEffect>
         <researchPrerequisites>
             <li>Electricity</li>
         </researchPrerequisites>
     </ThingDef>
 
-    <ThingDef ParentName="BuildingBase">
+    <ThingDef ParentName="BuildingBase" Name="PowerDiode_FeedNode">
         <defName>PowerDiode_FeedNode</defName>
         <label>power diode outlet</label>
         <description>Feeds power to this network from a paired power diode intake, up to a configurable wattage cap, and never more than the intake's network currently has to spare. Must be built directly adjacent to an unpaired intake.</description>
@@ -88,9 +89,52 @@
             <li>PowerDiode.PlaceWorker_PowerDiodeFeed</li>
         </placeWorkers>
         <designationCategory>Power</designationCategory>
+        <designatorDropdown>PowerDiode_Outlets</designatorDropdown>
         <constructEffect>ConstructMetal</constructEffect>
         <researchPrerequisites>
             <li>Electricity</li>
         </researchPrerequisites>
+    </ThingDef>
+
+    <ThingDef ParentName="PowerDiode_DrawNode">
+        <defName>PowerDiode_WallDrawNode</defName>
+        <label>wall-mounted power diode intake</label>
+        <description>Draws power from this network on behalf of a paired power diode outlet, up to whatever the outlet's wattage cap and its own network's surplus allow. Draws nothing when unpaired, or when its paired outlet isn't feeding. Built into an existing wall, taking the place of any power conduit under it.</description>
+        <graphicData>
+            <texPath>Buildings/PowerDiodeWallDrawNode</texPath>
+        </graphicData>
+        <altitudeLayer>BuildingOnTop</altitudeLayer>
+        <passability>Standable</passability>
+        <pathCost>0</pathCost>
+        <fillPercent>0</fillPercent>
+        <castEdgeShadows>false</castEdgeShadows>
+        <building>
+            <isEdifice>false</isEdifice>
+            <canPlaceOverWall>true</canPlaceOverWall>
+        </building>
+        <placeWorkers>
+            <li>PowerDiode.PlaceWorker_InWall</li>
+        </placeWorkers>
+    </ThingDef>
+
+    <ThingDef ParentName="PowerDiode_FeedNode">
+        <defName>PowerDiode_WallFeedNode</defName>
+        <label>wall-mounted power diode outlet</label>
+        <description>Feeds power to this network from a paired power diode intake, up to a configurable wattage cap, and never more than the intake's network currently has to spare. Must be built directly adjacent to an unpaired intake. Built into an existing wall, taking the place of any power conduit under it.</description>
+        <graphicData>
+            <texPath>Buildings/PowerDiodeWallFeedNode</texPath>
+        </graphicData>
+        <altitudeLayer>BuildingOnTop</altitudeLayer>
+        <passability>Standable</passability>
+        <pathCost>0</pathCost>
+        <fillPercent>0</fillPercent>
+        <castEdgeShadows>false</castEdgeShadows>
+        <building>
+            <isEdifice>false</isEdifice>
+            <canPlaceOverWall>true</canPlaceOverWall>
+        </building>
+        <placeWorkers>
+            <li>PowerDiode.PlaceWorker_InWall</li>
+        </placeWorkers>
     </ThingDef>
 </Defs>

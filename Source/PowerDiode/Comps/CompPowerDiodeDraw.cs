@@ -46,6 +46,11 @@ internal class CompPowerDiodeDraw : ThingComp
         Partner == null ? "PowerDiode.NotLinked".Translate()
         : Partner.IsSharedGridDegenerate
             ? "PowerDiode.SharedGrid".Translate(Partner.parent.LabelCap)
+        : Partner.MissingBatteries == PowerDiodeMissingBatteries.Intake
+            ? "PowerDiode.NoIntakeBatteries".Translate(
+                Partner.parent.LabelCap,
+                Partner.OperatingMode.Label()
+            )
         : PowerTrader.PowerOutput >= 0f ? "PowerDiode.LinkedIdle".Translate(Partner.parent.LabelCap)
         : "PowerDiode.Feeding".Translate(
             Partner.parent.LabelCap,
@@ -89,6 +94,10 @@ internal class CompPowerDiodeDraw : ThingComp
         if (partner.IsSharedGridDegenerate)
         {
             PowerDiodeOverlay.DrawSharedGridOverlay(parent);
+        }
+        else if (partner.MissingBatteries == PowerDiodeMissingBatteries.Intake)
+        {
+            PowerDiodeOverlay.DrawNoBatteriesOverlay(parent);
         }
     }
 }

@@ -5,6 +5,8 @@
     <PowerDiode.Feeding>Feeding {0}: {1} W</PowerDiode.Feeding>
     <PowerDiode.ReceivingFrom>Receiving from {0}: {1} W</PowerDiode.ReceivingFrom>
     <PowerDiode.SharedGrid>Linked to {0}, but disabled: another connection somewhere else joins the two sides.</PowerDiode.SharedGrid>
+    <PowerDiode.NoIntakeBatteries>Linked to {0}, but disabled: {1} mode needs batteries on this intake's network.</PowerDiode.NoIntakeBatteries>
+    <PowerDiode.NoOutletBatteries>Linked to {0}, but disabled: {1} mode needs batteries on this outlet's network.</PowerDiode.NoOutletBatteries>
     <PowerDiode.MustPlaceNextToUnpairedDrawNode>Must be placed directly adjacent to an unpaired power diode intake.</PowerDiode.MustPlaceNextToUnpairedDrawNode>
     <PowerDiode.MustPlaceInWall>Must be placed in a wall.</PowerDiode.MustPlaceInWall>
     <PowerDiode.LinkToOutlet>Link to outlet</PowerDiode.LinkToOutlet>

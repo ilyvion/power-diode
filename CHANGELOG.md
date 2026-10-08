@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Power diode intakes and outlets, including the wall-mounted ones, can now be uninstalled and reinstalled elsewhere. A reinstalled outlet keeps its settings, and like a newly built one, it can only be installed directly next to an unpaired intake.
 - While placing or installing a power diode intake or outlet, a line shows which building it will pair with. The line also shows when a placed blueprint or frame is selected.
 - An unpaired power diode intake or outlet next to an unpaired partner now has a gizmo to link the two, since they don't link up on their own once both are already built. When there's more than one unpaired partner next to it, the gizmo lets you pick which one.
+- A power diode set to a mode that can't work because a network has no batteries now shows a warning overlay and explains the problem in its inspect text. For an Overflow outlet whose intake network has no batteries, this shows on the intake. For a Top-up outlet whose own network has no batteries, it shows on the outlet.
 
 ### Fixed
 

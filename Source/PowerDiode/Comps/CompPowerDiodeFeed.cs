@@ -115,6 +115,27 @@ internal class CompPowerDiodeFeed : ThingComp
     // appear or disappear at any time (a new conduit built or removed elsewhere on the map).
     internal bool IsSharedGridDegenerate { get; private set; }
 
+    // Read live from both sides' power nets, so it's right even before the first tick after a
+    // spawn or load.
+    internal PowerDiodeMissingBatteries MissingBatteries
+    {
+        get
+        {
+            var outletNet = PowerTrader.PowerNet;
+            var intakeNet = Partner?.PowerTrader.PowerNet;
+            return
+                outletNet == null
+                || intakeNet == null
+                || PowerDiodeSharedGridDetection.IsSharedGrid(outletNet, intakeNet)
+                ? PowerDiodeMissingBatteries.None
+                : PowerDiodeMissingBatteriesDetection.MissingBatteries(
+                    OperatingMode,
+                    intakeHasBatteries: intakeNet.batteryComps.Count > 0,
+                    outletHasBatteries: outletNet.batteryComps.Count > 0
+                );
+        }
+    }
+
     internal CompPowerTrader PowerTrader
     {
         get
@@ -325,6 +346,11 @@ internal class CompPowerDiodeFeed : ThingComp
     public override string CompInspectStringExtra() =>
         Partner == null ? "PowerDiode.NotLinked".Translate()
         : IsSharedGridDegenerate ? "PowerDiode.SharedGrid".Translate(Partner.parent.LabelCap)
+        : MissingBatteries == PowerDiodeMissingBatteries.Outlet
+            ? "PowerDiode.NoOutletBatteries".Translate(
+                Partner.parent.LabelCap,
+                OperatingMode.Label()
+            )
         : CurrentFlowWatts <= 0f ? "PowerDiode.LinkedIdle".Translate(Partner.parent.LabelCap)
         : "PowerDiode.ReceivingFrom".Translate(
             Partner.parent.LabelCap,
@@ -346,6 +372,10 @@ internal class CompPowerDiodeFeed : ThingComp
         if (IsSharedGridDegenerate)
         {
             PowerDiodeOverlay.DrawSharedGridOverlay(parent);
+        }
+        else if (MissingBatteries == PowerDiodeMissingBatteries.Outlet)
+        {
+            PowerDiodeOverlay.DrawNoBatteriesOverlay(parent);
         }
     }
 

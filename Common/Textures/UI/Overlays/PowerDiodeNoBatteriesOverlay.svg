@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- battery body and terminal, flat UI-icon style -->
+  <rect x="6" y="19" width="46" height="26" rx="3" fill="#5a5e65"/>
+  <rect x="11" y="24" width="36" height="16" rx="1" fill="#82878e"/>
+  <rect x="52" y="26" width="6" height="12" rx="1.5" fill="#5a5e65"/>
+  <!-- red slash: no batteries -->
+  <path d="M12 12 L52 52" fill="none" stroke="#d64545" stroke-width="9" stroke-linecap="round"/>
+</svg>

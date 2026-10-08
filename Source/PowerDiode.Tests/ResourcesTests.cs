@@ -22,4 +22,12 @@ internal sealed class ResourcesTests
         Expect.IsNotNull(Resources.LinkNeighbourIcon);
         Expect.ReferencesAreNotEqual(BaseContent.BadTex, Resources.LinkNeighbourIcon);
     }
+
+    [Test]
+    public static void NoBatteriesOverlayIsLoaded()
+    {
+        var texture = PowerDiodeOverlay.NoBatteriesMat.mainTexture;
+        Expect.IsNotNull(texture);
+        Expect.ReferencesAreNotEqual(BaseContent.BadTex, texture);
+    }
 }

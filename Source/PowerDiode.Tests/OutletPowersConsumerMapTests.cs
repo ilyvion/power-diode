@@ -137,6 +137,35 @@ internal sealed class OutletPowersConsumerMapTests
         Expect.AreApproximatelyEqual(-lampPower.PowerOutput, feed.CurrentFlowWatts);
     }
 
+    // While power flows, the intake reports feeding the outlet and the outlet reports receiving
+    // from the intake.
+    [Test]
+    public IEnumerator InspectStringsDescribeFlowDirection()
+    {
+        var (_, feed) = SpawnDiode("PowerDiode_FeedNode");
+        var lampPower = SpawnSwitchedOffLamp(Origin + (IntVec3.East * 7));
+        Map.powerNetManager.UpdatePowerNetsAndConnections_First();
+
+        Expect.IsNotNull(feed.Partner);
+        var draw = feed.Partner!;
+
+        foreach (var frame in TickUntil(() => lampPower.PowerOn, TickTimeout))
+        {
+            yield return frame;
+        }
+        Expect.IsTrue(lampPower.PowerOn, "lamp powered");
+
+        var watts = feed.CurrentFlowWatts.ToString("F0", CultureInfo.InvariantCulture);
+        Expect.AreEqual(
+            "PowerDiode.Feeding".Translate(feed.parent.LabelCap, watts).ToString(),
+            draw.CompInspectStringExtra()
+        );
+        Expect.AreEqual(
+            "PowerDiode.ReceivingFrom".Translate(draw.parent.LabelCap, watts).ToString(),
+            feed.CompInspectStringExtra()
+        );
+    }
+
     // A lamp that browns out because the intake's battery reached the outlet's reserve floor (or
     // overflow threshold) stays off while that battery slowly recharges, rather than switching back
     // on as soon as there's a sliver of charge above the floor and browning out again moments later.

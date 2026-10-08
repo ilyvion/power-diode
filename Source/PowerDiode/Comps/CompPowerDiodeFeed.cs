@@ -362,7 +362,7 @@ internal class CompPowerDiodeFeed : ThingComp
         Partner == null ? "PowerDiode.NotLinked".Translate()
         : IsSharedGridDegenerate ? "PowerDiode.SharedGrid".Translate(Partner.parent.LabelCap)
         : CurrentFlowWatts <= 0f ? "PowerDiode.LinkedIdle".Translate(Partner.parent.LabelCap)
-        : "PowerDiode.Feeding".Translate(
+        : "PowerDiode.ReceivingFrom".Translate(
             Partner.parent.LabelCap,
             CurrentFlowWatts.ToString("F0", CultureInfo.InvariantCulture)
         );

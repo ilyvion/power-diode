@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- two copies of Buildings/PowerDiodeConnectorNub's clamp, facing each other and meeting in
+       the middle -->
+  <defs>
+    <g id="clamp">
+      <rect x="44" y="-4" width="40" height="26" rx="4" fill="#4a4d52" stroke="#1c1d1f" stroke-width="4"/>
+      <rect x="52" y="16" width="24" height="10" rx="2" fill="#2a2c2f" stroke="#1c1d1f" stroke-width="3"/>
+      <rect x="48" y="0" width="32" height="6" rx="2" fill="#6b6f76"/>
+    </g>
+  </defs>
+  <g transform="translate(32,32)">
+    <use href="#clamp" transform="matrix(0,1,-1,0,-4,-64)"/>
+    <use href="#clamp" transform="matrix(0,1,1,0,4,-64)"/>
+  </g>
+</svg>

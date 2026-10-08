@@ -63,7 +63,42 @@ internal static class PowerDiodeLinking
             f => f.Partner == null || f.Partner.parent == movingThing
         );
 
+    internal static List<CompPowerDiodeFeed> UnpairedAdjacentFeedNodes(CompPowerDiodeDraw draw) =>
+        [
+            .. AllAdjacent<CompPowerDiodeFeed>(
+                draw.parent.Position,
+                draw.parent.Map,
+                f => f.Partner == null
+            ),
+        ];
+
+    internal static List<CompPowerDiodeDraw> UnpairedAdjacentDrawNodes(CompPowerDiodeFeed feed) =>
+        [
+            .. AllAdjacent<CompPowerDiodeDraw>(
+                feed.parent.Position,
+                feed.parent.Map,
+                d => d.Partner == null
+            ),
+        ];
+
+    // Links two already-spawned diode buildings. Unpaired neighbours share one power net, so the
+    // nets around the outlet are rebuilt for the new link to split them apart.
+    internal static void LinkSpawned(CompPowerDiodeDraw draw, CompPowerDiodeFeed feed)
+    {
+        if (draw.Partner != null || feed.Partner != null)
+        {
+            return;
+        }
+        Link(draw, feed);
+        feed.parent.Map.powerNetManager.Notfiy_TransmitterTransmitsPowerNowChanged(
+            feed.PowerTrader
+        );
+    }
+
     private static T? FindAdjacent<T>(IntVec3 center, Map map, Predicate<T> validator)
+        where T : ThingComp => AllAdjacent(center, map, validator).FirstOrDefault();
+
+    private static IEnumerable<T> AllAdjacent<T>(IntVec3 center, Map map, Predicate<T> validator)
         where T : ThingComp
     {
         foreach (var dir in GenAdj.CardinalDirections)
@@ -80,11 +115,10 @@ internal static class PowerDiodeLinking
                     var comp = thingWithComps.GetComp<T>();
                     if (comp != null && validator(comp))
                     {
-                        return comp;
+                        yield return comp;
                     }
                 }
             }
         }
-        return null;
     }
 }

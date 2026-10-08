@@ -7,6 +7,11 @@
     <PowerDiode.SharedGrid>Linked to {0}, but disabled: another connection somewhere else joins the two sides.</PowerDiode.SharedGrid>
     <PowerDiode.MustPlaceNextToUnpairedDrawNode>Must be placed directly adjacent to an unpaired power diode intake.</PowerDiode.MustPlaceNextToUnpairedDrawNode>
     <PowerDiode.MustPlaceInWall>Must be placed in a wall.</PowerDiode.MustPlaceInWall>
+    <PowerDiode.LinkToOutlet>Link to outlet</PowerDiode.LinkToOutlet>
+    <PowerDiode.LinkToOutletDesc>Link this intake to an adjacent power diode outlet that isn't linked to anything yet.</PowerDiode.LinkToOutletDesc>
+    <PowerDiode.LinkToIntake>Link to intake</PowerDiode.LinkToIntake>
+    <PowerDiode.LinkToIntakeDesc>Link this outlet to an adjacent power diode intake that isn't linked to anything yet.</PowerDiode.LinkToIntakeDesc>
+    <PowerDiode.LinkTargetOption>{0} ({1})</PowerDiode.LinkTargetOption>
     <PowerDiode.WattageCapGizmoTitle>Wattage cap</PowerDiode.WattageCapGizmoTitle>
     <PowerDiode.WattageCapBarLabel>{0} / {1} W</PowerDiode.WattageCapBarLabel>
     <PowerDiode.WattageCapTooltip>The maximum wattage this outlet will feed to its network. It never feeds more than this, and never more than its paired intake's network currently has to spare.</PowerDiode.WattageCapTooltip>

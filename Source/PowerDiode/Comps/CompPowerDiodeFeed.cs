@@ -394,6 +394,20 @@ internal class CompPowerDiodeFeed : ThingComp
         {
             yield return gizmo;
         }
+        if (Partner == null)
+        {
+            var linkGizmo = PowerDiodeLinkGizmo.Create(
+                parent,
+                PowerDiodeLinking.UnpairedAdjacentDrawNodes(this),
+                "PowerDiode.LinkToIntake".Translate(),
+                "PowerDiode.LinkToIntakeDesc".Translate(),
+                draw => PowerDiodeLinking.LinkSpawned(draw, this)
+            );
+            if (linkGizmo != null)
+            {
+                yield return linkGizmo;
+            }
+        }
         yield return CreateModeGizmo();
         switch (OperatingMode)
         {

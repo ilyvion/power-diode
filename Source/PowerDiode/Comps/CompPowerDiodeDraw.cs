@@ -43,6 +43,28 @@ internal class CompPowerDiodeDraw : ThingComp
             (-PowerTrader.PowerOutput).ToString("F0", CultureInfo.InvariantCulture)
         );
 
+    public override IEnumerable<Gizmo> CompGetGizmosExtra()
+    {
+        foreach (var gizmo in base.CompGetGizmosExtra())
+        {
+            yield return gizmo;
+        }
+        if (Partner == null)
+        {
+            var linkGizmo = PowerDiodeLinkGizmo.Create(
+                parent,
+                PowerDiodeLinking.UnpairedAdjacentFeedNodes(this),
+                "PowerDiode.LinkToOutlet".Translate(),
+                "PowerDiode.LinkToOutletDesc".Translate(),
+                feed => PowerDiodeLinking.LinkSpawned(this, feed)
+            );
+            if (linkGizmo != null)
+            {
+                yield return linkGizmo;
+            }
+        }
+    }
+
     public override void PostDraw()
     {
         base.PostDraw();

@@ -22,7 +22,7 @@ internal class Gizmo_SetDiodeOverflowThreshold : Gizmo_Slider
         );
 
     protected override int Increments =>
-        Mathf.Max(1, Mathf.RoundToInt(100f / feed.Props.percentStepSize));
+        DiodeSliderMath.Increments(100f, feed.Props.percentStepSize);
 
     protected override bool DraggingBar
     {

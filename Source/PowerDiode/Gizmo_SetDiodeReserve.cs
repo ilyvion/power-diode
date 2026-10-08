@@ -6,16 +6,18 @@ internal class Gizmo_SetDiodeReserve : Gizmo_Slider
 
     private static bool IsPercentMode => PowerDiodeMod.Settings.ReserveIsPercentage;
 
-    private static float SliderRangeWattDays =>
-        PowerDiodeMod.Settings.MaxReserveWattDays - PowerDiodeMod.Settings.MinReserveWattDays;
+    private static float MinWattDays => PowerDiodeMod.Settings.MinReserveWattDays;
+    private static float MaxWattDays => PowerDiodeMod.Settings.MaxReserveWattDays;
+
+    internal static bool IsShown =>
+        IsPercentMode || DiodeSliderMath.HasRange(MinWattDays, MaxWattDays);
 
     protected override float Target
     {
         get =>
             IsPercentMode
                 ? feed.ReservePercent / 100f
-                : (feed.ReserveWattDays - PowerDiodeMod.Settings.MinReserveWattDays)
-                    / SliderRangeWattDays;
+                : DiodeSliderMath.ToFraction(feed.ReserveWattDays, MinWattDays, MaxWattDays);
         set
         {
             if (IsPercentMode)
@@ -24,8 +26,11 @@ internal class Gizmo_SetDiodeReserve : Gizmo_Slider
             }
             else
             {
-                feed.ReserveWattDays =
-                    PowerDiodeMod.Settings.MinReserveWattDays + (value * SliderRangeWattDays);
+                feed.ReserveWattDays = DiodeSliderMath.FromFraction(
+                    value,
+                    MinWattDays,
+                    MaxWattDays
+                );
             }
         }
     }
@@ -34,8 +39,11 @@ internal class Gizmo_SetDiodeReserve : Gizmo_Slider
         IsPercentMode
             ? feed.SourceBatteryStoredPercent
             : Mathf.Clamp01(
-                (feed.SourceBatteryStoredWattDays - PowerDiodeMod.Settings.MinReserveWattDays)
-                    / SliderRangeWattDays
+                DiodeSliderMath.ToFraction(
+                    feed.SourceBatteryStoredWattDays,
+                    MinWattDays,
+                    MaxWattDays
+                )
             );
 
     protected override string Title => "PowerDiode.ReserveGizmoTitle".Translate();
@@ -53,10 +61,10 @@ internal class Gizmo_SetDiodeReserve : Gizmo_Slider
 
     protected override int Increments =>
         IsPercentMode
-            ? Mathf.Max(1, Mathf.RoundToInt(100f / feed.Props.percentStepSize))
-            : Mathf.Max(
-                1,
-                Mathf.RoundToInt(SliderRangeWattDays / feed.Props.reserveWattDaysStepSize)
+            ? DiodeSliderMath.Increments(100f, feed.Props.percentStepSize)
+            : DiodeSliderMath.Increments(
+                MaxWattDays - MinWattDays,
+                feed.Props.reserveWattDaysStepSize
             );
 
     protected override bool DraggingBar

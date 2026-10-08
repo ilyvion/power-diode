@@ -4,19 +4,19 @@ internal class Gizmo_SetDiodeWattage : Gizmo_Slider
 {
     private readonly CompPowerDiodeFeed feed;
 
-    private static float SliderRangeWatts =>
-        PowerDiodeMod.Settings.MaxWattage - PowerDiodeMod.Settings.MinWattage;
+    private static float MinWatts => PowerDiodeMod.Settings.MinWattage;
+    private static float MaxWatts => PowerDiodeMod.Settings.MaxWattage;
+
+    internal static bool IsShown => DiodeSliderMath.HasRange(MinWatts, MaxWatts);
 
     protected override float Target
     {
-        get => (feed.TargetWatts - PowerDiodeMod.Settings.MinWattage) / SliderRangeWatts;
-        set => feed.TargetWatts = PowerDiodeMod.Settings.MinWattage + (value * SliderRangeWatts);
+        get => DiodeSliderMath.ToFraction(feed.TargetWatts, MinWatts, MaxWatts);
+        set => feed.TargetWatts = DiodeSliderMath.FromFraction(value, MinWatts, MaxWatts);
     }
 
     protected override float ValuePercent =>
-        Mathf.Clamp01(
-            (feed.CurrentFlowWatts - PowerDiodeMod.Settings.MinWattage) / SliderRangeWatts
-        );
+        Mathf.Clamp01(DiodeSliderMath.ToFraction(feed.CurrentFlowWatts, MinWatts, MaxWatts));
 
     protected override string Title => "PowerDiode.WattageCapGizmoTitle".Translate();
 
@@ -25,11 +25,11 @@ internal class Gizmo_SetDiodeWattage : Gizmo_Slider
     protected override string BarLabel =>
         "PowerDiode.WattageCapBarLabel".Translate(
             feed.TargetWatts.ToString("F0", CultureInfo.InvariantCulture),
-            PowerDiodeMod.Settings.MaxWattage.ToString("F0", CultureInfo.InvariantCulture)
+            MaxWatts.ToString("F0", CultureInfo.InvariantCulture)
         );
 
     protected override int Increments =>
-        Mathf.Max(1, Mathf.RoundToInt(SliderRangeWatts / feed.Props.wattageStepSize));
+        DiodeSliderMath.Increments(MaxWatts - MinWatts, feed.Props.wattageStepSize);
 
     protected override bool DraggingBar
     {

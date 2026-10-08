@@ -410,10 +410,16 @@ internal class CompPowerDiodeFeed : ThingComp
                 break;
             case PowerDiodeOperatingMode.OneWayValve:
             default:
-                yield return new Gizmo_SetDiodeReserve(this);
+                if (Gizmo_SetDiodeReserve.IsShown)
+                {
+                    yield return new Gizmo_SetDiodeReserve(this);
+                }
                 break;
         }
-        yield return new Gizmo_SetDiodeWattage(this);
+        if (Gizmo_SetDiodeWattage.IsShown)
+        {
+            yield return new Gizmo_SetDiodeWattage(this);
+        }
     }
 
     private Command_Action CreateModeGizmo() =>

@@ -17,18 +17,12 @@ internal class Settings : ModSettings
     public float MaxReserveWattDays = DefaultMaxReserveWattDays;
     public bool ReserveIsPercentage;
 
-    private static string minWattageBuffer = DefaultMinWattage.ToString(
-        CultureInfo.InvariantCulture
-    );
-    private static string maxWattageBuffer = DefaultMaxWattage.ToString(
-        CultureInfo.InvariantCulture
-    );
-    private static string minReserveWattDaysBuffer = DefaultMinReserveWattDays.ToString(
-        CultureInfo.InvariantCulture
-    );
-    private static string maxReserveWattDaysBuffer = DefaultMaxReserveWattDays.ToString(
-        CultureInfo.InvariantCulture
-    );
+    // Widgets.TextFieldNumeric fills a null buffer from the field's current value, and otherwise
+    // shows the buffer as is, so these must be null whenever the values are (re)loaded.
+    internal static string? minWattageBuffer;
+    internal static string? maxWattageBuffer;
+    internal static string? minReserveWattDaysBuffer;
+    internal static string? maxReserveWattDaysBuffer;
 
     public override void ExposeData()
     {
@@ -38,6 +32,14 @@ internal class Settings : ModSettings
         Scribe_Values.Look(ref MinReserveWattDays, "minReserveWattDays", DefaultMinReserveWattDays);
         Scribe_Values.Look(ref MaxReserveWattDays, "maxReserveWattDays", DefaultMaxReserveWattDays);
         Scribe_Values.Look(ref ReserveIsPercentage, "reserveIsPercentage");
+
+        if (Scribe.mode == LoadSaveMode.LoadingVars)
+        {
+            minWattageBuffer = null;
+            maxWattageBuffer = null;
+            minReserveWattDaysBuffer = null;
+            maxReserveWattDaysBuffer = null;
+        }
     }
 
     public static void DoSettingsWindowContents(Rect inRect)

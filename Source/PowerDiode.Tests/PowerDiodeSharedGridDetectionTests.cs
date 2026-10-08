@@ -1,16 +1,16 @@
-using RimTestRedux;
+using DevTools.Testing;
 
 namespace PowerDiode.Tests;
 
-[TestSuite]
-internal static class PowerDiodeSharedGridDetectionTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class PowerDiodeSharedGridDetectionTests
 {
     [Test]
     public static void SameInstanceIsSharedGrid()
     {
         var net = new object();
 
-        Assert.That(PowerDiodeSharedGridDetection.IsSharedGrid(net, net)).Is.True();
+        Expect.IsTrue(PowerDiodeSharedGridDetection.IsSharedGrid(net, net));
     }
 
     [Test]
@@ -19,7 +19,7 @@ internal static class PowerDiodeSharedGridDetectionTests
         var sinkNet = new object();
         var sourceNet = new object();
 
-        Assert.That(PowerDiodeSharedGridDetection.IsSharedGrid(sinkNet, sourceNet)).Is.False();
+        Expect.IsFalse(PowerDiodeSharedGridDetection.IsSharedGrid(sinkNet, sourceNet));
     }
 
     [Test]
@@ -27,10 +27,10 @@ internal static class PowerDiodeSharedGridDetectionTests
     {
         var sourceNet = new object();
 
-        Assert.That(PowerDiodeSharedGridDetection.IsSharedGrid(null, sourceNet)).Is.False();
+        Expect.IsFalse(PowerDiodeSharedGridDetection.IsSharedGrid(null, sourceNet));
     }
 
     [Test]
     public static void BothNullIsNotSharedGrid() =>
-        Assert.That(PowerDiodeSharedGridDetection.IsSharedGrid<object>(null, null)).Is.False();
+        Expect.IsFalse(PowerDiodeSharedGridDetection.IsSharedGrid<object>(null, null));
 }

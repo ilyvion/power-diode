@@ -1,9 +1,9 @@
-using RimTestRedux;
+using DevTools.Testing;
 
 namespace PowerDiode.Tests;
 
-[TestSuite]
-internal static class PowerDiodeFlowTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class PowerDiodeFlowTests
 {
     [Test]
     public static void FlowIsZeroWhenSinkHasNoDeficitAndNoBatteryHeadroom()
@@ -15,7 +15,7 @@ internal static class PowerDiodeFlowTests
             sinkBatteryHeadroomWatts: 0f,
             sourceBatteryReserveWatts: 0f
         );
-        Assert.That(flow).Is.EqualTo(0f);
+        Expect.AreEqual(0f, flow);
     }
 
     [Test]
@@ -28,7 +28,7 @@ internal static class PowerDiodeFlowTests
             sinkBatteryHeadroomWatts: 0f,
             sourceBatteryReserveWatts: 0f
         );
-        Assert.That(flow).Is.EqualTo(150f);
+        Expect.AreEqual(150f, flow);
     }
 
     [Test]
@@ -41,7 +41,7 @@ internal static class PowerDiodeFlowTests
             sinkBatteryHeadroomWatts: 0f,
             sourceBatteryReserveWatts: 0f
         );
-        Assert.That(flow).Is.EqualTo(500f);
+        Expect.AreEqual(500f, flow);
     }
 
     [Test]
@@ -54,7 +54,7 @@ internal static class PowerDiodeFlowTests
             sinkBatteryHeadroomWatts: 0f,
             sourceBatteryReserveWatts: 0f
         );
-        Assert.That(flow).Is.EqualTo(120f);
+        Expect.AreEqual(120f, flow);
     }
 
     [Test]
@@ -67,7 +67,7 @@ internal static class PowerDiodeFlowTests
             sinkBatteryHeadroomWatts: 0f,
             sourceBatteryReserveWatts: 0f
         );
-        Assert.That(flow).Is.EqualTo(0f);
+        Expect.AreEqual(0f, flow);
     }
 
     [Test]
@@ -80,7 +80,7 @@ internal static class PowerDiodeFlowTests
             sinkBatteryHeadroomWatts: 0f,
             sourceBatteryReserveWatts: 0f
         );
-        Assert.That(flow).Is.EqualTo(0f);
+        Expect.AreEqual(0f, flow);
     }
 
     // The diode was explicitly created to charge batteries: unfilled battery capacity on the
@@ -95,7 +95,7 @@ internal static class PowerDiodeFlowTests
             sinkBatteryHeadroomWatts: 300f,
             sourceBatteryReserveWatts: 0f
         );
-        Assert.That(flow).Is.EqualTo(300f);
+        Expect.AreEqual(300f, flow);
     }
 
     [Test]
@@ -108,7 +108,7 @@ internal static class PowerDiodeFlowTests
             sinkBatteryHeadroomWatts: 300f,
             sourceBatteryReserveWatts: 0f
         );
-        Assert.That(flow).Is.EqualTo(75f);
+        Expect.AreEqual(75f, flow);
     }
 
     [Test]
@@ -121,7 +121,7 @@ internal static class PowerDiodeFlowTests
             sinkBatteryHeadroomWatts: 200f,
             sourceBatteryReserveWatts: 0f
         );
-        Assert.That(flow).Is.EqualTo(200f);
+        Expect.AreEqual(200f, flow);
     }
 
     [Test]
@@ -134,7 +134,7 @@ internal static class PowerDiodeFlowTests
             sinkBatteryHeadroomWatts: 0f,
             sourceBatteryReserveWatts: 0f
         );
-        Assert.That(flow).Is.EqualTo(0f);
+        Expect.AreEqual(0f, flow);
     }
 
     // A source network holding only a battery (no generator, no other consumer) reports a zero
@@ -150,7 +150,7 @@ internal static class PowerDiodeFlowTests
             sinkBatteryHeadroomWatts: 0f,
             sourceBatteryReserveWatts: 300f
         );
-        Assert.That(flow).Is.EqualTo(300f);
+        Expect.AreEqual(300f, flow);
     }
 
     [Test]
@@ -163,7 +163,7 @@ internal static class PowerDiodeFlowTests
             sinkBatteryHeadroomWatts: 0f,
             sourceBatteryReserveWatts: 300f
         );
-        Assert.That(flow).Is.EqualTo(75f);
+        Expect.AreEqual(75f, flow);
     }
 
     // A healthily charged battery should back a diode's draw at full strength, ramped down only
@@ -175,7 +175,7 @@ internal static class PowerDiodeFlowTests
     {
         var watts = PowerDiodeFlow.BatterySustainableWatts(1f);
         var expected = 1f / (PowerDiodeFlow.ReactionMarginTicks * CompPower.WattsToWattDaysPerTick);
-        Assert.That(watts).Is.EqualTo(expected);
+        Expect.AreEqual(expected, watts);
     }
 
     [Test]
@@ -183,7 +183,7 @@ internal static class PowerDiodeFlowTests
     {
         var watts = PowerDiodeFlow.BatterySustainableWatts(15f, reserveBufferWattDays: 10f);
         var expected = 5f / (PowerDiodeFlow.ReactionMarginTicks * CompPower.WattsToWattDaysPerTick);
-        Assert.That(watts).Is.EqualTo(expected);
+        Expect.AreEqual(expected, watts);
     }
 
     // Once the network's total stored energy is at or below the reserve buffer, the battery is
@@ -191,26 +191,25 @@ internal static class PowerDiodeFlowTests
     [Test]
     public static void BatterySustainableWattsIsZeroAtOrBelowReserveBuffer()
     {
-        Assert
-            .That(PowerDiodeFlow.BatterySustainableWatts(10f, reserveBufferWattDays: 10f))
-            .Is.EqualTo(0f);
-        Assert
-            .That(PowerDiodeFlow.BatterySustainableWatts(5f, reserveBufferWattDays: 10f))
-            .Is.EqualTo(0f);
+        Expect.AreEqual(
+            0f,
+            PowerDiodeFlow.BatterySustainableWatts(10f, reserveBufferWattDays: 10f)
+        );
+        Expect.AreEqual(0f, PowerDiodeFlow.BatterySustainableWatts(5f, reserveBufferWattDays: 10f));
     }
 
     [Test]
     public static void BatterySustainableWattsIsZeroForNoStoredOrAcceptableEnergy()
     {
         var watts = PowerDiodeFlow.BatterySustainableWatts(0f);
-        Assert.That(watts).Is.EqualTo(0f);
+        Expect.AreEqual(0f, watts);
     }
 
     [Test]
     public static void BatterySustainableWattsClampsNegativeWattDaysToZero()
     {
         var watts = PowerDiodeFlow.BatterySustainableWatts(-5f);
-        Assert.That(watts).Is.EqualTo(0f);
+        Expect.AreEqual(0f, watts);
     }
 
     [Test]
@@ -223,7 +222,7 @@ internal static class PowerDiodeFlowTests
             sinkBatteryHeadroomWatts: 0f,
             sourceBatteryReserveWatts: 200f
         );
-        Assert.That(flow).Is.EqualTo(200f);
+        Expect.AreEqual(200f, flow);
     }
 
     [Test]
@@ -236,7 +235,7 @@ internal static class PowerDiodeFlowTests
             reservePercent: 20f,
             sourceBatteryCapacityWattDays: 1000f
         );
-        Assert.That(floor).Is.EqualTo(50f);
+        Expect.AreEqual(50f, floor);
     }
 
     [Test]
@@ -249,7 +248,7 @@ internal static class PowerDiodeFlowTests
             reservePercent: 20f,
             sourceBatteryCapacityWattDays: 1000f
         );
-        Assert.That(floor).Is.EqualTo(200f);
+        Expect.AreEqual(200f, floor);
     }
 
     [Test]
@@ -262,7 +261,7 @@ internal static class PowerDiodeFlowTests
             reservePercent: 999f,
             sourceBatteryCapacityWattDays: 1000f
         );
-        Assert.That(floor).Is.EqualTo(0f);
+        Expect.AreEqual(0f, floor);
     }
 
     [Test]
@@ -275,32 +274,30 @@ internal static class PowerDiodeFlowTests
             reservePercent: 20f,
             sourceBatteryCapacityWattDays: 1000f
         );
-        Assert.That(floor).Is.EqualTo(0f);
+        Expect.AreEqual(0f, floor);
     }
 
     [Test]
     public static void OverflowGateIsZeroAtOrBelowThreshold()
     {
-        Assert
-            .That(
-                PowerDiodeFlow.OverflowGateFraction(
-                    capWatts: 500f,
-                    overflowThresholdPercent: 80f,
-                    sourceBatteryStoredWattDays: 800f,
-                    sourceBatteryCapacityWattDays: 1000f
-                )
+        Expect.AreEqual(
+            0f,
+            PowerDiodeFlow.OverflowGateFraction(
+                capWatts: 500f,
+                overflowThresholdPercent: 80f,
+                sourceBatteryStoredWattDays: 800f,
+                sourceBatteryCapacityWattDays: 1000f
             )
-            .Is.EqualTo(0f);
-        Assert
-            .That(
-                PowerDiodeFlow.OverflowGateFraction(
-                    capWatts: 500f,
-                    overflowThresholdPercent: 80f,
-                    sourceBatteryStoredWattDays: 600f,
-                    sourceBatteryCapacityWattDays: 1000f
-                )
+        );
+        Expect.AreEqual(
+            0f,
+            PowerDiodeFlow.OverflowGateFraction(
+                capWatts: 500f,
+                overflowThresholdPercent: 80f,
+                sourceBatteryStoredWattDays: 600f,
+                sourceBatteryCapacityWattDays: 1000f
             )
-            .Is.EqualTo(0f);
+        );
     }
 
     [Test]
@@ -312,7 +309,7 @@ internal static class PowerDiodeFlowTests
             sourceBatteryStoredWattDays: 1000f,
             sourceBatteryCapacityWattDays: 1000f
         );
-        Assert.That(gate).Is.EqualTo(1f);
+        Expect.AreEqual(1f, gate);
     }
 
     [Test]
@@ -324,32 +321,30 @@ internal static class PowerDiodeFlowTests
             sourceBatteryStoredWattDays: 1000f,
             sourceBatteryCapacityWattDays: 1000f
         );
-        Assert.That(gate).Is.EqualTo(0f);
+        Expect.AreEqual(0f, gate);
     }
 
     [Test]
     public static void TopUpGateIsZeroAtOrAboveThreshold()
     {
-        Assert
-            .That(
-                PowerDiodeFlow.TopUpGateFraction(
-                    capWatts: 500f,
-                    topUpThresholdPercent: 20f,
-                    sinkBatteryStoredWattDays: 200f,
-                    sinkBatteryCapacityWattDays: 1000f
-                )
+        Expect.AreEqual(
+            0f,
+            PowerDiodeFlow.TopUpGateFraction(
+                capWatts: 500f,
+                topUpThresholdPercent: 20f,
+                sinkBatteryStoredWattDays: 200f,
+                sinkBatteryCapacityWattDays: 1000f
             )
-            .Is.EqualTo(0f);
-        Assert
-            .That(
-                PowerDiodeFlow.TopUpGateFraction(
-                    capWatts: 500f,
-                    topUpThresholdPercent: 20f,
-                    sinkBatteryStoredWattDays: 800f,
-                    sinkBatteryCapacityWattDays: 1000f
-                )
+        );
+        Expect.AreEqual(
+            0f,
+            PowerDiodeFlow.TopUpGateFraction(
+                capWatts: 500f,
+                topUpThresholdPercent: 20f,
+                sinkBatteryStoredWattDays: 800f,
+                sinkBatteryCapacityWattDays: 1000f
             )
-            .Is.EqualTo(0f);
+        );
     }
 
     [Test]
@@ -361,7 +356,7 @@ internal static class PowerDiodeFlowTests
             sinkBatteryStoredWattDays: 0f,
             sinkBatteryCapacityWattDays: 1000f
         );
-        Assert.That(gate).Is.EqualTo(1f);
+        Expect.AreEqual(1f, gate);
     }
 
     [Test]
@@ -373,6 +368,6 @@ internal static class PowerDiodeFlowTests
             sinkBatteryStoredWattDays: 0f,
             sinkBatteryCapacityWattDays: 1000f
         );
-        Assert.That(gate).Is.EqualTo(0f);
+        Expect.AreEqual(0f, gate);
     }
 }

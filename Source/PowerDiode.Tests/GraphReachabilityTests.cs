@@ -1,9 +1,9 @@
-using RimTestRedux;
+using DevTools.Testing;
 
 namespace PowerDiode.Tests;
 
-[TestSuite]
-internal static class GraphReachabilityTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class GraphReachabilityTests
 {
     private static Dictionary<char, char[]> LineGraph() =>
         new()
@@ -29,7 +29,7 @@ internal static class GraphReachabilityTests
             (_, _) => false
         );
 
-        Assert.ThatCollection(reachable).Has.Count(4);
+        Expect.AreEqual(4, reachable.Count);
     }
 
     // Regression guard for the diode use case: blocking a single edge must split the
@@ -46,9 +46,9 @@ internal static class GraphReachabilityTests
             (from, to) => (from == 'B' && to == 'C') || (from == 'C' && to == 'B')
         );
 
-        Assert.ThatCollection(reachable).Has.Count(2);
-        Assert.ThatCollection(reachable).Does.Contain('A');
-        Assert.ThatCollection(reachable).Does.Contain('B');
+        Expect.AreEqual(2, reachable.Count);
+        Expect.IsTrue(reachable.Contains('A'));
+        Expect.IsTrue(reachable.Contains('B'));
     }
 
     [Test]
@@ -68,7 +68,7 @@ internal static class GraphReachabilityTests
             (_, _) => false
         );
 
-        Assert.ThatCollection(reachable).Has.Count(2);
-        Assert.ThatCollection(reachable).Does.Not.Contain('C');
+        Expect.AreEqual(2, reachable.Count);
+        Expect.IsFalse(reachable.Contains('C'));
     }
 }

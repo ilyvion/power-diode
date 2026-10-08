@@ -1,12 +1,12 @@
-using RimTestRedux;
+using DevTools.Testing;
 
 namespace PowerDiode.Tests;
 
-[TestSuite]
-internal static class CompPowerDiodeFeedSettingsTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class CompPowerDiodeFeedSettingsTests
 {
     // ThingMaker.MakeThing's PostMake calls ThingIDMaker.GiveIDTo, which needs
-    // Find.UniqueIDsManager - unavailable outside a loaded game/map, and RimTest Redux runs at
+    // Find.UniqueIDsManager - unavailable outside a loaded game/map, and these tests run at
     // the main menu. These tests only touch comp state, so constructing the ThingWithComps
     // directly and initializing its comps - skipping PostMake entirely - is enough.
     private static CompPowerDiodeFeed MakeFeedComp()
@@ -31,10 +31,10 @@ internal static class CompPowerDiodeFeedSettingsTests
             var feed = MakeFeedComp();
 
             feed.TargetWatts = 50f;
-            Assert.That(feed.TargetWatts).Is.EqualTo(100f);
+            Expect.AreEqual(100f, feed.TargetWatts);
 
             feed.TargetWatts = 1000f;
-            Assert.That(feed.TargetWatts).Is.EqualTo(200f);
+            Expect.AreEqual(200f, feed.TargetWatts);
         }
         finally
         {
@@ -56,10 +56,10 @@ internal static class CompPowerDiodeFeedSettingsTests
             var feed = MakeFeedComp();
 
             feed.ReserveWattDays = 5f;
-            Assert.That(feed.ReserveWattDays).Is.EqualTo(20f);
+            Expect.AreEqual(20f, feed.ReserveWattDays);
 
             feed.ReserveWattDays = 1000f;
-            Assert.That(feed.ReserveWattDays).Is.EqualTo(300f);
+            Expect.AreEqual(300f, feed.ReserveWattDays);
         }
         finally
         {
@@ -74,10 +74,10 @@ internal static class CompPowerDiodeFeedSettingsTests
         var feed = MakeFeedComp();
 
         feed.ReservePercent = -10f;
-        Assert.That(feed.ReservePercent).Is.EqualTo(0f);
+        Expect.AreEqual(0f, feed.ReservePercent);
 
         feed.ReservePercent = 150f;
-        Assert.That(feed.ReservePercent).Is.EqualTo(100f);
+        Expect.AreEqual(100f, feed.ReservePercent);
     }
 
     [Test]
@@ -86,10 +86,10 @@ internal static class CompPowerDiodeFeedSettingsTests
         var feed = MakeFeedComp();
 
         feed.OverflowThresholdPercent = -10f;
-        Assert.That(feed.OverflowThresholdPercent).Is.EqualTo(0f);
+        Expect.AreEqual(0f, feed.OverflowThresholdPercent);
 
         feed.OverflowThresholdPercent = 150f;
-        Assert.That(feed.OverflowThresholdPercent).Is.EqualTo(100f);
+        Expect.AreEqual(100f, feed.OverflowThresholdPercent);
     }
 
     [Test]
@@ -98,9 +98,9 @@ internal static class CompPowerDiodeFeedSettingsTests
         var feed = MakeFeedComp();
 
         feed.TopUpThresholdPercent = -10f;
-        Assert.That(feed.TopUpThresholdPercent).Is.EqualTo(0f);
+        Expect.AreEqual(0f, feed.TopUpThresholdPercent);
 
         feed.TopUpThresholdPercent = 150f;
-        Assert.That(feed.TopUpThresholdPercent).Is.EqualTo(100f);
+        Expect.AreEqual(100f, feed.TopUpThresholdPercent);
     }
 }

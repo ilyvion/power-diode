@@ -1,17 +1,17 @@
+using DevTools.Testing;
 using PowerDiode.Patch;
-using RimTestRedux;
 
 namespace PowerDiode.Tests;
 
-[TestSuite]
-internal static class PowerNetMakerContiguousPowerBuildingsTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class PowerNetMakerContiguousPowerBuildingsTests
 {
     private static Building MakeDrawNode() => MakeBuilding("PowerDiode_DrawNode");
 
     private static Building MakeFeedNode() => MakeBuilding("PowerDiode_FeedNode");
 
     // ThingMaker.MakeThing's PostMake calls ThingIDMaker.GiveIDTo, which needs
-    // Find.UniqueIDsManager - unavailable outside a loaded game/map, and RimTest Redux runs at
+    // Find.UniqueIDsManager - unavailable outside a loaded game/map, and these tests run at
     // the main menu. These tests only touch comp state, so constructing the ThingWithComps
     // directly and initializing its comps - skipping PostMake entirely - is enough.
     private static Building MakeBuilding(string defName)
@@ -33,8 +33,8 @@ internal static class PowerNetMakerContiguousPowerBuildingsTests
         drawComp.Partner = feedComp;
         feedComp.Partner = drawComp;
 
-        Assert.That(PowerNetMaker_ContiguousPowerBuildings.IsDiodeLinkEdge(draw, feed)).Is.True();
-        Assert.That(PowerNetMaker_ContiguousPowerBuildings.IsDiodeLinkEdge(feed, draw)).Is.True();
+        Expect.IsTrue(PowerNetMaker_ContiguousPowerBuildings.IsDiodeLinkEdge(draw, feed));
+        Expect.IsTrue(PowerNetMaker_ContiguousPowerBuildings.IsDiodeLinkEdge(feed, draw));
     }
 
     [Test]
@@ -43,8 +43,8 @@ internal static class PowerNetMakerContiguousPowerBuildingsTests
         var draw = MakeDrawNode();
         var feed = MakeFeedNode();
 
-        Assert.That(PowerNetMaker_ContiguousPowerBuildings.IsDiodeLinkEdge(draw, feed)).Is.False();
-        Assert.That(PowerNetMaker_ContiguousPowerBuildings.IsDiodeLinkEdge(feed, draw)).Is.False();
+        Expect.IsFalse(PowerNetMaker_ContiguousPowerBuildings.IsDiodeLinkEdge(draw, feed));
+        Expect.IsFalse(PowerNetMaker_ContiguousPowerBuildings.IsDiodeLinkEdge(feed, draw));
     }
 
     // A draw node linked to some other feed node must not block an unrelated feed node
@@ -60,8 +60,6 @@ internal static class PowerNetMakerContiguousPowerBuildingsTests
         drawComp.Partner = linkedFeedComp;
         linkedFeedComp.Partner = drawComp;
 
-        Assert
-            .That(PowerNetMaker_ContiguousPowerBuildings.IsDiodeLinkEdge(draw, unrelatedFeed))
-            .Is.False();
+        Expect.IsFalse(PowerNetMaker_ContiguousPowerBuildings.IsDiodeLinkEdge(draw, unrelatedFeed));
     }
 }

@@ -1,4 +1,4 @@
-using RimTestRedux;
+using DevTools.Testing;
 
 namespace PowerDiode.Tests;
 
@@ -9,8 +9,8 @@ namespace PowerDiode.Tests;
 // save/load cycle (via ilyvion.Laboratory's CustomStream Scribe helpers, so no on-disk save file
 // is needed), changing the relevant setting between save and load, and assert the saved value
 // survives regardless.
-[TestSuite]
-internal static class CompPowerDiodeFeedScribeTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class CompPowerDiodeFeedScribeTests
 {
     private sealed class NonClosingStream(Stream inner) : Stream
     {
@@ -103,7 +103,7 @@ internal static class CompPowerDiodeFeedScribeTests
             var loadHarness = new FeedHarness();
             Load(memory, loadHarness);
 
-            Assert.That(loadHarness.Comp.TargetWatts).Is.EqualTo(200f);
+            Expect.AreEqual(200f, loadHarness.Comp.TargetWatts);
         }
         finally
         {
@@ -127,7 +127,7 @@ internal static class CompPowerDiodeFeedScribeTests
             var loadHarness = new FeedHarness();
             Load(memory, loadHarness);
 
-            Assert.That(loadHarness.Comp.ReserveWattDays).Is.EqualTo(20f);
+            Expect.AreEqual(20f, loadHarness.Comp.ReserveWattDays);
         }
         finally
         {

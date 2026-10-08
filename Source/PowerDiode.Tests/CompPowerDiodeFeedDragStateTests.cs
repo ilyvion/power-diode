@@ -1,12 +1,12 @@
-using RimTestRedux;
+using DevTools.Testing;
 
 namespace PowerDiode.Tests;
 
-[TestSuite]
-internal static class CompPowerDiodeFeedDragStateTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class CompPowerDiodeFeedDragStateTests
 {
     // ThingMaker.MakeThing's PostMake calls ThingIDMaker.GiveIDTo, which needs
-    // Find.UniqueIDsManager - unavailable outside a loaded game/map, and RimTest Redux runs at
+    // Find.UniqueIDsManager - unavailable outside a loaded game/map, and these tests run at
     // the main menu. These tests only touch comp state, so constructing the ThingWithComps
     // directly and initializing its comps - skipping PostMake entirely - is enough.
     private static CompPowerDiodeFeed MakeFeedComp()
@@ -30,15 +30,15 @@ internal static class CompPowerDiodeFeedDragStateTests
         var feedB = MakeFeedComp();
 
         feedA.draggingReserveBar = true;
-        Assert.That(feedB.draggingReserveBar).Is.False();
+        Expect.IsFalse(feedB.draggingReserveBar);
 
         feedA.draggingWattageBar = true;
-        Assert.That(feedB.draggingWattageBar).Is.False();
+        Expect.IsFalse(feedB.draggingWattageBar);
 
         feedA.draggingOverflowBar = true;
-        Assert.That(feedB.draggingOverflowBar).Is.False();
+        Expect.IsFalse(feedB.draggingOverflowBar);
 
         feedA.draggingTopUpBar = true;
-        Assert.That(feedB.draggingTopUpBar).Is.False();
+        Expect.IsFalse(feedB.draggingTopUpBar);
     }
 }

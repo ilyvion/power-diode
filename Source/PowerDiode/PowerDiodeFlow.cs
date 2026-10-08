@@ -77,13 +77,29 @@ internal static class PowerDiodeFlow
         float netBalanceExclSelf,
         IEnumerable<float> switchedOffDrawWatts,
         float restartSupplyWatts
+    ) =>
+        BalanceWithStartableConsumers(
+            netBalanceExclSelf,
+            switchedOffDrawWatts,
+            restartSupplyWatts,
+            out _
+        );
+
+    // anyLeftOut is set when at least one switched-off consumer was left out.
+    public static float BalanceWithStartableConsumers(
+        float netBalanceExclSelf,
+        IEnumerable<float> switchedOffDrawWatts,
+        float restartSupplyWatts,
+        out bool anyLeftOut
     )
     {
+        anyLeftOut = false;
         var balance = netBalanceExclSelf;
         foreach (var drawWatts in switchedOffDrawWatts.OrderBy(watts => watts))
         {
             if (drawWatts - balance > restartSupplyWatts)
             {
+                anyLeftOut = true;
                 break;
             }
             balance -= drawWatts;
@@ -119,6 +135,19 @@ internal static class PowerDiodeFlow
         sourceHasWaitingConsumers
             ? Math.Max(reserveFloorWattDays, PowerNet.MinStoredEnergyToTurnOn)
             : reserveFloorWattDays;
+
+    // Vanilla PowerNet only switches on a consumer its network's surplus can't cover once the
+    // network's batteries hold PowerNet.MinStoredEnergyToTurnOn, so while such a consumer waits on
+    // the source network and its batteries are below that (but can hold it), the source surplus is
+    // left to charge them.
+    public static bool HoldsBackSourceSurplus(
+        bool sourceHasUncoveredWaitingConsumers,
+        float sourceBatteryStoredWattDays,
+        float sourceBatteryCapacityWattDays
+    ) =>
+        sourceHasUncoveredWaitingConsumers
+        && sourceBatteryStoredWattDays < PowerNet.MinStoredEnergyToTurnOn
+        && sourceBatteryCapacityWattDays >= PowerNet.MinStoredEnergyToTurnOn;
 
     // Overflow mode's whole-flow gate: 0 while the source network's batteries are at or below the
     // threshold percentage of their capacity, ramping up to 1 over the final
@@ -165,4 +194,90 @@ internal static class PowerDiodeFlow
         var sustainableWatts = BatterySustainableWatts(headroomWattDays);
         return Mathf.Clamp01(sustainableWatts / capWatts);
     }
+
+    // The flow a diode feeds this tick.
+    public static float TickFlowWatts(FlowTickInputs inputs)
+    {
+        // The source network's own switched-off consumers come first: surplus that covers them is
+        // left for vanilla to switch them on with.
+        var sourceBalanceExclSelf = BalanceWithStartableConsumers(
+            inputs.SourceRawBalanceExclSelf,
+            inputs.SourceSwitchedOffDrawWatts,
+            0f,
+            out var sourceHasUncoveredWaitingConsumers
+        );
+        if (
+            HoldsBackSourceSurplus(
+                sourceHasUncoveredWaitingConsumers,
+                inputs.SourceStoredWattDays,
+                inputs.SourceCapacityWattDays
+            )
+        )
+        {
+            sourceBalanceExclSelf = Math.Min(sourceBalanceExclSelf, 0f);
+        }
+
+        var sourceReserveFloorWattDays = SourceReserveFloorWithWaitingConsumersWattDays(
+            SourceReserveFloorWattDays(
+                inputs.Mode,
+                inputs.ReserveWattDays,
+                inputs.ReserveIsPercentage,
+                inputs.ReservePercent,
+                inputs.SourceCapacityWattDays
+            ),
+            inputs.SourceSwitchedOffDrawWatts.Count > 0
+        );
+
+        var sinkBatteryHeadroomWatts = BatterySustainableWatts(inputs.SinkAcceptWattDays);
+        var sourceBatteryReserveWatts = BatterySustainableWatts(
+            inputs.SourceStoredWattDays,
+            sourceReserveFloorWattDays
+        );
+
+        // The stricter supply a switched-off sink consumer has to fit within before it counts as
+        // demand, so it isn't started on power that's about to run out.
+        var sourceBatteryRestartWatts = BatterySustainableWatts(
+            inputs.SourceStoredWattDays,
+            sourceReserveFloorWattDays + RestartMarginWattDays
+        );
+        var restartSupplyWatts = SourceSupplyWatts(
+            inputs.TargetWatts * ModeGateFraction(inputs, RestartMarginWattDays),
+            sourceBalanceExclSelf,
+            sourceBatteryRestartWatts
+        );
+        var sinkBalanceExclSelf = BalanceWithStartableConsumers(
+            inputs.SinkRawBalanceExclSelf,
+            inputs.SinkSwitchedOffDrawWatts,
+            restartSupplyWatts
+        );
+
+        return ComputeFlowWatts(
+            inputs.TargetWatts * ModeGateFraction(inputs, 0f),
+            sinkBalanceExclSelf,
+            sourceBalanceExclSelf,
+            sinkBatteryHeadroomWatts,
+            sourceBatteryReserveWatts
+        );
+    }
+
+    // overflowMarginWattDays only applies in Overflow mode, raising its threshold.
+    private static float ModeGateFraction(FlowTickInputs inputs, float overflowMarginWattDays) =>
+        inputs.Mode switch
+        {
+            PowerDiodeOperatingMode.Overflow => OverflowGateFraction(
+                inputs.TargetWatts,
+                inputs.OverflowThresholdPercent,
+                inputs.SourceStoredWattDays,
+                inputs.SourceCapacityWattDays,
+                overflowMarginWattDays
+            ),
+            PowerDiodeOperatingMode.TopUp => TopUpGateFraction(
+                inputs.TargetWatts,
+                inputs.TopUpThresholdPercent,
+                inputs.SinkStoredWattDays,
+                inputs.SinkCapacityWattDays
+            ),
+            PowerDiodeOperatingMode.OneWayValve => 1f,
+            _ => throw new ArgumentOutOfRangeException(nameof(inputs), inputs.Mode, null),
+        };
 }

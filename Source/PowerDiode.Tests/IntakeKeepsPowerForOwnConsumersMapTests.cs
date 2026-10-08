@@ -211,4 +211,33 @@ internal sealed class IntakeKeepsPowerForOwnConsumersMapTests
         Expect.IsFalse(intakeSwitchedOff, "intake stayed on");
         Expect.GreaterThan(feed.CurrentFlowWatts, 0f, "diode still feeding");
     }
+
+    // Regression: a switched-off consumer drawing more than the intake network's surplus only
+    // switches on once the intake's batteries hold PowerNet.MinStoredEnergyToTurnOn, but the diode
+    // kept taking the surplus that would have charged them there, so it stayed off.
+    [Test]
+    public IEnumerator IntakeLampDrawingMoreThanTheSurplusSwitchesOnOnceBatteryCharges()
+    {
+        PowerDiodeMod.Settings.MinReserveWattDays = 0f;
+        PowerDiodeMod.Settings.ReserveIsPercentage = false;
+        var (generator, lamp, feed) = SpawnScenario();
+        lamp.PowerOutput = -(generator.PowerOutput + 200f);
+        var sourceBattery = Spawn<Building>("Battery", Origin + (IntVec3.South * 2))
+            .GetComp<CompPowerBattery>();
+        sourceBattery.SetStoredEnergyPct(2f / sourceBattery.Props.storedEnergyMax);
+        Map.powerNetManager.UpdatePowerNetsAndConnections_First();
+        Expect.ReferencesAreEqual(feed.Partner!.PowerTrader.PowerNet, sourceBattery.PowerNet);
+        Expect.ReferencesAreEqual(lamp.PowerNet, sourceBattery.PowerNet);
+
+        feed.ReserveWattDays = 0f;
+        feed.CompTick();
+        Expect.AreEqual(0f, feed.CurrentFlowWatts, "surplus left to charge the intake battery");
+
+        foreach (var frame in TickUntil(() => lamp.PowerOn, TickTimeout))
+        {
+            yield return frame;
+        }
+
+        Expect.IsTrue(lamp.PowerOn, "intake lamp powered");
+    }
 }

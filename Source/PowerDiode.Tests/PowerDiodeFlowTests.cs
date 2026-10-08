@@ -451,6 +451,70 @@ internal sealed class PowerDiodeFlowTests
     }
 
     [Test]
+    public static void StartableConsumersReportWhetherAnyWasLeftOut()
+    {
+        _ = PowerDiodeFlow.BalanceWithStartableConsumers(
+            netBalanceExclSelf: 100f,
+            switchedOffDrawWatts: [60f, 30f],
+            restartSupplyWatts: 0f,
+            out var noneLeftOut
+        );
+        _ = PowerDiodeFlow.BalanceWithStartableConsumers(
+            netBalanceExclSelf: 100f,
+            switchedOffDrawWatts: [60f, 50f],
+            restartSupplyWatts: 0f,
+            out var oneLeftOut
+        );
+        _ = PowerDiodeFlow.BalanceWithStartableConsumers(
+            netBalanceExclSelf: 100f,
+            switchedOffDrawWatts: [],
+            restartSupplyWatts: 0f,
+            out var noConsumers
+        );
+
+        Expect.IsFalse(noneLeftOut, "all covered");
+        Expect.IsTrue(oneLeftOut, "one not covered");
+        Expect.IsFalse(noConsumers, "no consumers");
+    }
+
+    [Test]
+    public static void SourceSurplusIsHeldBackOnlyWhileBatteriesCanReachVanillaSwitchOnCharge()
+    {
+        Expect.IsTrue(
+            PowerDiodeFlow.HoldsBackSourceSurplus(
+                sourceHasUncoveredWaitingConsumers: true,
+                sourceBatteryStoredWattDays: 2f,
+                sourceBatteryCapacityWattDays: 600f
+            ),
+            "below switch-on charge"
+        );
+        Expect.IsFalse(
+            PowerDiodeFlow.HoldsBackSourceSurplus(
+                sourceHasUncoveredWaitingConsumers: true,
+                sourceBatteryStoredWattDays: 5f,
+                sourceBatteryCapacityWattDays: 600f
+            ),
+            "at switch-on charge"
+        );
+        Expect.IsFalse(
+            PowerDiodeFlow.HoldsBackSourceSurplus(
+                sourceHasUncoveredWaitingConsumers: true,
+                sourceBatteryStoredWattDays: 2f,
+                sourceBatteryCapacityWattDays: 4f
+            ),
+            "capacity below switch-on charge"
+        );
+        Expect.IsFalse(
+            PowerDiodeFlow.HoldsBackSourceSurplus(
+                sourceHasUncoveredWaitingConsumers: false,
+                sourceBatteryStoredWattDays: 2f,
+                sourceBatteryCapacityWattDays: 600f
+            ),
+            "no uncovered consumer"
+        );
+    }
+
+    [Test]
     public static void SourceReserveFloorIsRaisedToVanillaSwitchOnChargeWhileConsumersWait()
     {
         var floor = PowerDiodeFlow.SourceReserveFloorWithWaitingConsumersWattDays(

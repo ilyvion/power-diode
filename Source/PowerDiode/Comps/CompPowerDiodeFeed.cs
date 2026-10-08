@@ -253,17 +253,6 @@ internal class CompPowerDiodeFeed : ThingComp
         }
         IsSharedGridDegenerate = false;
 
-        // The source network's own switched-off consumers come first: surplus that covers them is
-        // left for vanilla to switch them on with.
-        var sourceRawBalanceExclSelf = NetBalanceExcluding(sourceNet, partner.PowerTrader);
-        var sourceBalanceExclSelf = PowerDiodeFlow.BalanceWithStartableConsumers(
-            sourceRawBalanceExclSelf,
-            SwitchedOffDrawWatts(sourceNet, partner.PowerTrader),
-            0f
-        );
-        var sinkAcceptWattDays = sinkNet.batteryComps.Sum(battery =>
-            Math.Max(0f, battery.AmountCanAccept)
-        );
         SourceBatteryStoredWattDays = sourceNet.batteryComps.Sum(battery =>
             Math.Max(0f, battery.StoredEnergy)
         );
@@ -277,75 +266,35 @@ internal class CompPowerDiodeFeed : ThingComp
             battery.Props.storedEnergyMax
         );
 
-        var sourceReserveFloorWattDays =
-            PowerDiodeFlow.SourceReserveFloorWithWaitingConsumersWattDays(
-                PowerDiodeFlow.SourceReserveFloorWattDays(
-                    OperatingMode,
-                    ReserveWattDays,
-                    PowerDiodeMod.Settings.ReserveIsPercentage,
-                    ReservePercent,
-                    SourceBatteryCapacityWattDays
+        CurrentFlowWatts = PowerDiodeFlow.TickFlowWatts(
+            new(
+                Mode: OperatingMode,
+                TargetWatts: TargetWatts,
+                ReserveWattDays: ReserveWattDays,
+                ReserveIsPercentage: PowerDiodeMod.Settings.ReserveIsPercentage,
+                ReservePercent: ReservePercent,
+                OverflowThresholdPercent: OverflowThresholdPercent,
+                TopUpThresholdPercent: TopUpThresholdPercent,
+                SourceRawBalanceExclSelf: NetBalanceExcluding(sourceNet, partner.PowerTrader),
+                SourceSwitchedOffDrawWatts:
+                [
+                    .. SwitchedOffDrawWatts(sourceNet, partner.PowerTrader),
+                ],
+                SinkRawBalanceExclSelf: NetBalanceExcluding(sinkNet, PowerTrader),
+                SinkSwitchedOffDrawWatts: [.. SwitchedOffDrawWatts(sinkNet, PowerTrader)],
+                SinkAcceptWattDays: sinkNet.batteryComps.Sum(battery =>
+                    Math.Max(0f, battery.AmountCanAccept)
                 ),
-                sourceBalanceExclSelf < sourceRawBalanceExclSelf
-            );
-
-        var sinkBatteryHeadroomWatts = PowerDiodeFlow.BatterySustainableWatts(sinkAcceptWattDays);
-        var sourceBatteryReserveWatts = PowerDiodeFlow.BatterySustainableWatts(
-            SourceBatteryStoredWattDays,
-            sourceReserveFloorWattDays
-        );
-
-        var modeGateFraction = ModeGateFraction(OperatingMode, 0f);
-
-        // The stricter supply a switched-off sink consumer has to fit within before it counts as
-        // demand, so it isn't started on power that's about to run out.
-        var sourceBatteryRestartWatts = PowerDiodeFlow.BatterySustainableWatts(
-            SourceBatteryStoredWattDays,
-            sourceReserveFloorWattDays + PowerDiodeFlow.RestartMarginWattDays
-        );
-        var restartSupplyWatts = PowerDiodeFlow.SourceSupplyWatts(
-            TargetWatts * ModeGateFraction(OperatingMode, PowerDiodeFlow.RestartMarginWattDays),
-            sourceBalanceExclSelf,
-            sourceBatteryRestartWatts
-        );
-        var sinkBalanceExclSelf = PowerDiodeFlow.BalanceWithStartableConsumers(
-            NetBalanceExcluding(sinkNet, PowerTrader),
-            SwitchedOffDrawWatts(sinkNet, PowerTrader),
-            restartSupplyWatts
-        );
-
-        CurrentFlowWatts = PowerDiodeFlow.ComputeFlowWatts(
-            TargetWatts * modeGateFraction,
-            sinkBalanceExclSelf,
-            sourceBalanceExclSelf,
-            sinkBatteryHeadroomWatts,
-            sourceBatteryReserveWatts
+                SourceStoredWattDays: SourceBatteryStoredWattDays,
+                SourceCapacityWattDays: SourceBatteryCapacityWattDays,
+                SinkStoredWattDays: SinkBatteryStoredWattDays,
+                SinkCapacityWattDays: SinkBatteryCapacityWattDays
+            )
         );
 
         PowerTrader.PowerOutput = CurrentFlowWatts;
         partner.PowerTrader.PowerOutput = -CurrentFlowWatts;
     }
-
-    // overflowMarginWattDays only applies in Overflow mode, raising its threshold.
-    private float ModeGateFraction(PowerDiodeOperatingMode mode, float overflowMarginWattDays) =>
-        mode switch
-        {
-            PowerDiodeOperatingMode.Overflow => PowerDiodeFlow.OverflowGateFraction(
-                TargetWatts,
-                OverflowThresholdPercent,
-                SourceBatteryStoredWattDays,
-                SourceBatteryCapacityWattDays,
-                overflowMarginWattDays
-            ),
-            PowerDiodeOperatingMode.TopUp => PowerDiodeFlow.TopUpGateFraction(
-                TargetWatts,
-                TopUpThresholdPercent,
-                SinkBatteryStoredWattDays,
-                SinkBatteryCapacityWattDays
-            ),
-            PowerDiodeOperatingMode.OneWayValve => 1f,
-            _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null),
-        };
 
     private static float NetBalanceExcluding(PowerNet net, CompPowerTrader self)
     {

@@ -137,6 +137,65 @@ internal sealed class OutletPowersConsumerMapTests
         Expect.AreApproximatelyEqual(-lampPower.PowerOutput, feed.CurrentFlowWatts);
     }
 
+    // A consumer that's flicked off or broken down isn't demand, so the outlet feeds it nothing
+    // until it's flicked back on or repaired.
+    [Test]
+    public IEnumerator DisabledConsumerIsNotFedUntilReenabled(
+        [Parameters("Flicked", "BrokenDown")] string disabledBy
+    )
+    {
+        var (_, feed) = SpawnDiode("PowerDiode_FeedNode");
+        var beacon = Spawn<Building>("OrbitalTradeBeacon", Origin + (IntVec3.East * 7));
+        var beaconPower = beacon.GetComp<CompPowerTrader>();
+        var flickable = beacon.GetComp<CompFlickable>();
+        var breakdownable = beacon.GetComp<CompBreakdownable>();
+        if (disabledBy == "Flicked")
+        {
+            flickable.SwitchIsOn = false;
+        }
+        else
+        {
+            breakdownable.DoBreakdown();
+        }
+        beaconPower.PowerOn = false;
+        Map.powerNetManager.UpdatePowerNetsAndConnections_First();
+
+        Expect.IsNotNull(feed.Partner);
+        Expect.ReferencesAreEqual(feed.PowerTrader.PowerNet, beaconPower.PowerNet);
+        Expect.LessThan(beaconPower.PowerOutput, 0f, "beacon is a consumer");
+
+        var fedWhileDisabled = false;
+        var poweredWhileDisabled = false;
+        for (var ticks = 0; ticks < TickTimeout; ticks += TicksPerFrame)
+        {
+            for (var i = 0; i < TicksPerFrame; i++)
+            {
+                Find.TickManager.DoSingleTick();
+                fedWhileDisabled |= feed.CurrentFlowWatts > 0f;
+                poweredWhileDisabled |= beaconPower.PowerOn;
+            }
+            yield return null;
+        }
+        Expect.IsFalse(fedWhileDisabled, "no flow while disabled");
+        Expect.IsFalse(poweredWhileDisabled, "beacon stayed off while disabled");
+
+        if (disabledBy == "Flicked")
+        {
+            flickable.SwitchIsOn = true;
+        }
+        else
+        {
+            breakdownable.Notify_Repaired();
+        }
+        foreach (var frame in TickUntil(() => beaconPower.PowerOn, TickTimeout))
+        {
+            yield return frame;
+        }
+
+        Expect.IsTrue(beaconPower.PowerOn, "beacon powered once reenabled");
+        Expect.AreApproximatelyEqual(-beaconPower.PowerOutput, feed.CurrentFlowWatts);
+    }
+
     // While power flows, the intake reports feeding the outlet and the outlet reports receiving
     // from the intake.
     [Test]

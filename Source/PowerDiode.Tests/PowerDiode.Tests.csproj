@@ -45,6 +45,7 @@
             <CopyLocal>False</CopyLocal>
             <Private>false</Private>
         </ProjectReference>
+        <Publicize Include="Assembly-CSharp:Verse.FloatMenu.options" />
     </ItemGroup>
     <ItemGroup Condition="'$(RimWorldVersion)' != '1.6'">
         <Compile Remove="**/*.cs" />

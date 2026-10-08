@@ -330,16 +330,16 @@ internal class CompPowerDiodeFeed : ThingComp
         return balance;
     }
 
-    // The draw of each consumer vanilla PowerNet.PowerNetTick would switch on if the network had
-    // the surplus for it.
     private static IEnumerable<float> SwitchedOffDrawWatts(PowerNet net, CompPowerTrader self) =>
         net
             .powerComps.Where(comp =>
-                comp != self
-                && !comp.PowerOn
-                && comp.PowerOutput < 0f
-                && FlickUtility.WantsToBeOn(comp.parent)
-                && !comp.parent.IsBrokenDown()
+                PowerDiodeFlow.IsStartableSwitchedOff(
+                    isSelf: comp == self,
+                    powerOn: comp.PowerOn,
+                    powerOutput: comp.PowerOutput,
+                    wantsToBeOn: FlickUtility.WantsToBeOn(comp.parent),
+                    brokenDown: comp.parent.IsBrokenDown()
+                )
             )
             .Select(comp => -comp.PowerOutput);
 

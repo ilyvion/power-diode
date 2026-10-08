@@ -641,4 +641,78 @@ internal sealed class PowerDiodeFlowTests
         );
         Expect.AreEqual(0f, gate);
     }
+
+    [Test]
+    public static void SwitchedOffConsumerThatWantsToBeOnIsStartable() =>
+        Expect.IsTrue(
+            PowerDiodeFlow.IsStartableSwitchedOff(
+                isSelf: false,
+                powerOn: false,
+                powerOutput: -100f,
+                wantsToBeOn: true,
+                brokenDown: false
+            )
+        );
+
+    [Test]
+    public static void PoweredConsumerIsNotStartable() =>
+        Expect.IsFalse(
+            PowerDiodeFlow.IsStartableSwitchedOff(
+                isSelf: false,
+                powerOn: true,
+                powerOutput: -100f,
+                wantsToBeOn: true,
+                brokenDown: false
+            )
+        );
+
+    [Test]
+    public static void FlickedOffConsumerIsNotStartable() =>
+        Expect.IsFalse(
+            PowerDiodeFlow.IsStartableSwitchedOff(
+                isSelf: false,
+                powerOn: false,
+                powerOutput: -100f,
+                wantsToBeOn: false,
+                brokenDown: false
+            )
+        );
+
+    [Test]
+    public static void BrokenDownConsumerIsNotStartable() =>
+        Expect.IsFalse(
+            PowerDiodeFlow.IsStartableSwitchedOff(
+                isSelf: false,
+                powerOn: false,
+                powerOutput: -100f,
+                wantsToBeOn: true,
+                brokenDown: true
+            )
+        );
+
+    [Test]
+    public static void SwitchedOffGeneratorIsNotStartable(
+        [Parameters(0f, 100f)] float powerOutput
+    ) =>
+        Expect.IsFalse(
+            PowerDiodeFlow.IsStartableSwitchedOff(
+                isSelf: false,
+                powerOn: false,
+                powerOutput: powerOutput,
+                wantsToBeOn: true,
+                brokenDown: false
+            )
+        );
+
+    [Test]
+    public static void DiodesOwnTraderIsNotStartable() =>
+        Expect.IsFalse(
+            PowerDiodeFlow.IsStartableSwitchedOff(
+                isSelf: true,
+                powerOn: false,
+                powerOutput: -100f,
+                wantsToBeOn: true,
+                brokenDown: false
+            )
+        );
 }

@@ -22,6 +22,7 @@ internal sealed class LinkUnpairedNeighbourMapTests
             }
         }
         spawned.Clear();
+        _ = Find.WindowStack.TryRemove(typeof(FloatMenu), doCloseSound: false);
     }
 
     private Building Spawn(string defName, IntVec3 cell)
@@ -159,5 +160,48 @@ internal sealed class LinkUnpairedNeighbourMapTests
 
         ExpectPaired(draw, chosen);
         Expect.IsNull(candidates[1 - chosenIndex].Partner);
+    }
+
+    private static string OptionLabel(CompPowerDiodeFeed feed, Rot4 direction) =>
+        "PowerDiode.LinkTargetOption".Translate(feed.parent.LabelCap, direction.ToStringHuman());
+
+    [Test]
+    public void IntakeLinkGizmoMenuLinksTheChosenOutlet([Parameters(true, false)] bool chooseWest)
+    {
+        var (draw, westFeed) = SpawnStrandedNeighbours();
+        var eastFeed = Spawn("PowerDiode_FeedNode", Origin + IntVec3.East)
+            .GetComp<CompPowerDiodeFeed>();
+        // Spawning pairs the new outlet with the unpaired intake, so unpair it again.
+        eastFeed.Unlink();
+
+        IntakeLinkGizmo(draw)!.action();
+
+        var menu = Find.WindowStack.WindowOfType<FloatMenu>();
+        Expect.IsNotNull(menu);
+        if (menu == null)
+        {
+            return;
+        }
+        Expect.AreEqual(2, menu.options.Count);
+        var westOption = menu.options.FirstOrDefault(option =>
+            option.Label == OptionLabel(westFeed, Rot4.West)
+        );
+        var eastOption = menu.options.FirstOrDefault(option =>
+            option.Label == OptionLabel(eastFeed, Rot4.East)
+        );
+        Expect.IsNotNull(westOption, "west option");
+        Expect.IsNotNull(eastOption, "east option");
+        if (westOption == null || eastOption == null)
+        {
+            return;
+        }
+
+        var (chosenOption, chosen, other) = chooseWest
+            ? (westOption, westFeed, eastFeed)
+            : (eastOption, eastFeed, westFeed);
+        chosenOption.action();
+
+        ExpectPaired(draw, chosen);
+        Expect.IsNull(other.Partner);
     }
 }

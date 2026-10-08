@@ -66,6 +66,16 @@ internal static class PowerDiodeFlow
         return Math.Clamp(sourceSurplus, 0f, capWatts);
     }
 
+    // Whether a power comp is a consumer vanilla PowerNet.PowerNetTick would switch on if its
+    // network had the surplus for it.
+    internal static bool IsStartableSwitchedOff(
+        bool isSelf,
+        bool powerOn,
+        float powerOutput,
+        bool wantsToBeOn,
+        bool brokenDown
+    ) => !isSelf && !powerOn && powerOutput < 0f && wantsToBeOn && !brokenDown;
+
     // Vanilla PowerNet only switches a consumer on once its network already has the surplus to
     // cover it, and a switched-off consumer doesn't count towards a net balance, so without this
     // the diode would neither feed a switched-off consumer on its sink network nor leave room for

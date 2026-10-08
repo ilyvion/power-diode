@@ -1,3 +1,5 @@
+using System.Text;
+using System.Text.RegularExpressions;
 using DevTools.Testing;
 
 namespace PowerDiode.Tests;
@@ -70,5 +72,86 @@ internal sealed class CompPowerDiodeFeedScribeTests
         {
             settings.MinReserveWattDays = originalMin;
         }
+    }
+
+    private static FeedHarness MakeHarness(
+        PowerDiodeOperatingMode mode,
+        float reservePercent,
+        float overflowThresholdPercent,
+        float topUpThresholdPercent
+    ) =>
+        new()
+        {
+            Comp =
+            {
+                OperatingMode = mode,
+                ReservePercent = reservePercent,
+                OverflowThresholdPercent = overflowThresholdPercent,
+                TopUpThresholdPercent = topUpThresholdPercent,
+            },
+        };
+
+    private static void ExpectFields(
+        FeedHarness harness,
+        PowerDiodeOperatingMode mode,
+        float reservePercent,
+        float overflowThresholdPercent,
+        float topUpThresholdPercent
+    )
+    {
+        Expect.AreEqual(mode, harness.Comp.OperatingMode, "operating mode");
+        Expect.AreEqual(reservePercent, harness.Comp.ReservePercent, "reserve percent");
+        Expect.AreEqual(
+            overflowThresholdPercent,
+            harness.Comp.OverflowThresholdPercent,
+            "overflow threshold"
+        );
+        Expect.AreEqual(
+            topUpThresholdPercent,
+            harness.Comp.TopUpThresholdPercent,
+            "top-up threshold"
+        );
+    }
+
+    [Test]
+    public static void NonDefaultModeAndPercentagesSurviveRoundTrip()
+    {
+        using var memory = Save(MakeHarness(PowerDiodeOperatingMode.TopUp, 42f, 35f, 65f));
+
+        var loadHarness = MakeHarness(PowerDiodeOperatingMode.OneWayValve, 10f, 80f, 20f);
+        Load(memory, loadHarness);
+
+        ExpectFields(loadHarness, PowerDiodeOperatingMode.TopUp, 42f, 35f, 65f);
+    }
+
+    // Default values are left out of the save, so they must load back as the same defaults.
+    [Test]
+    public static void DefaultModeAndPercentagesSurviveRoundTrip()
+    {
+        using var memory = Save(MakeHarness(PowerDiodeOperatingMode.OneWayValve, 10f, 80f, 20f));
+
+        var loadHarness = MakeHarness(PowerDiodeOperatingMode.TopUp, 42f, 35f, 65f);
+        Load(memory, loadHarness);
+
+        ExpectFields(loadHarness, PowerDiodeOperatingMode.OneWayValve, 10f, 80f, 20f);
+    }
+
+    [Test]
+    public static void SaveWithoutModeOrPercentagesLoadsDefaults()
+    {
+        using var saved = Save(MakeHarness(PowerDiodeOperatingMode.TopUp, 42f, 35f, 65f));
+        using var reader = new StreamReader(saved);
+        var xml = reader.ReadToEnd();
+        const string FieldsPattern =
+            @"<(operatingMode|reservePercent|overflowThresholdPercent|topUpThresholdPercent)>[^<]*</\1>";
+        Expect.AreEqual(4, Regex.Matches(xml, FieldsPattern).Count, "fields in the save");
+        using var edited = new MemoryStream(
+            Encoding.UTF8.GetBytes(Regex.Replace(xml, FieldsPattern, ""))
+        );
+
+        var loadHarness = MakeHarness(PowerDiodeOperatingMode.TopUp, 42f, 35f, 65f);
+        Load(edited, loadHarness);
+
+        ExpectFields(loadHarness, PowerDiodeOperatingMode.OneWayValve, 10f, 80f, 20f);
     }
 }

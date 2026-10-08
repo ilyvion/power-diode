@@ -11,6 +11,13 @@ internal static class PowerDiodeFlow
     // to catch up before the battery actually runs dry.
     public const int ReactionMarginTicks = 30;
 
+    // How far above its reserve floor (or overflow threshold) the source network's batteries must
+    // be before a switched-off sink consumer counts as demand, matching vanilla PowerNet's own
+    // MinStoredEnergyToTurnOn. This keeps a consumer that browned out at the floor from switching
+    // back on as soon as the battery recharges past the ReactionMarginTicks ramp, only to brown
+    // out again moments later.
+    public const float RestartMarginWattDays = 5f;
+
     // Converts a battery's remaining charge capacity or stored energy (in watt-days) to a
     // sustainable wattage, treating reserveBufferWattDays of it as untouchable and ramping the
     // rest down to 0 over the final ReactionMarginTicks ticks' worth of watt-days rather than
@@ -39,10 +46,48 @@ internal static class PowerDiodeFlow
         var consumerDeficit = Math.Max(0f, -sinkNetBalanceExclSelf);
         var batteryDemand = Math.Max(0f, sinkBatteryHeadroomWatts);
         var sinkDeficit = consumerDeficit + batteryDemand;
+        var sourceSupply = SourceSupplyWatts(
+            capWatts,
+            sourceNetBalanceExclSelf,
+            sourceBatteryReserveWatts
+        );
+        return Math.Min(sinkDeficit, sourceSupply);
+    }
+
+    // The most the diode can feed, regardless of how much the sink network wants.
+    public static float SourceSupplyWatts(
+        float capWatts,
+        float sourceNetBalanceExclSelf,
+        float sourceBatteryReserveWatts
+    )
+    {
         var sourceSurplus =
             Math.Max(0f, sourceNetBalanceExclSelf) + Math.Max(0f, sourceBatteryReserveWatts);
-        var flow = Math.Min(capWatts, Math.Min(sinkDeficit, sourceSurplus));
-        return Math.Clamp(flow, 0f, capWatts);
+        return Math.Clamp(sourceSurplus, 0f, capWatts);
+    }
+
+    // Vanilla PowerNet only switches a consumer on once its network already has the surplus to
+    // cover it, and a switched-off consumer doesn't count towards sinkNetBalanceExclSelf, so on its
+    // own the diode would never feed it. Returns sinkNetBalanceExclSelf less the draw of each
+    // switched-off consumer, smallest first, for as long as restartSupplyWatts still covers the
+    // resulting deficit; a consumer the supply can't fully cover is left out rather than fed power
+    // it can never switch on with.
+    public static float SinkBalanceWithStartableConsumers(
+        float sinkNetBalanceExclSelf,
+        IEnumerable<float> switchedOffDrawWatts,
+        float restartSupplyWatts
+    )
+    {
+        var balance = sinkNetBalanceExclSelf;
+        foreach (var drawWatts in switchedOffDrawWatts.OrderBy(watts => watts))
+        {
+            if (drawWatts - balance > restartSupplyWatts)
+            {
+                break;
+            }
+            balance -= drawWatts;
+        }
+        return balance;
     }
 
     // The reserve floor BatterySustainableWatts ramps the source battery's contribution down to
@@ -70,19 +115,21 @@ internal static class PowerDiodeFlow
     // gates the diode's entire output - including any flow that would otherwise be driven by the
     // sink network's own consumer deficit - not just the portion drawn from the source battery
     // itself, since CompTick recomputes it fresh every tick as the source battery's stored energy
-    // changes.
+    // changes. marginWattDays raises the threshold by that many watt-days.
     public static float OverflowGateFraction(
         float capWatts,
         float overflowThresholdPercent,
         float sourceBatteryStoredWattDays,
-        float sourceBatteryCapacityWattDays
+        float sourceBatteryCapacityWattDays,
+        float marginWattDays = 0f
     )
     {
         if (capWatts <= 0f)
         {
             return 0f;
         }
-        var floorWattDays = overflowThresholdPercent / 100f * sourceBatteryCapacityWattDays;
+        var floorWattDays =
+            (overflowThresholdPercent / 100f * sourceBatteryCapacityWattDays) + marginWattDays;
         var sustainableWatts = BatterySustainableWatts(sourceBatteryStoredWattDays, floorWattDays);
         return Mathf.Clamp01(sustainableWatts / capWatts);
     }

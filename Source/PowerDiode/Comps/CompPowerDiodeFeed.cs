@@ -238,7 +238,6 @@ internal class CompPowerDiodeFeed : ThingComp
         }
         IsSharedGridDegenerate = false;
 
-        var sinkBalanceExclSelf = NetBalanceExcluding(sinkNet, PowerTrader);
         var sourceBalanceExclSelf = NetBalanceExcluding(sourceNet, partner.PowerTrader);
         var sinkAcceptWattDays = sinkNet.batteryComps.Sum(battery =>
             Math.Max(0f, battery.AmountCanAccept)
@@ -270,23 +269,24 @@ internal class CompPowerDiodeFeed : ThingComp
             sourceReserveFloorWattDays
         );
 
-        var modeGateFraction = OperatingMode switch
-        {
-            PowerDiodeOperatingMode.Overflow => PowerDiodeFlow.OverflowGateFraction(
-                TargetWatts,
-                OverflowThresholdPercent,
-                SourceBatteryStoredWattDays,
-                SourceBatteryCapacityWattDays
-            ),
-            PowerDiodeOperatingMode.TopUp => PowerDiodeFlow.TopUpGateFraction(
-                TargetWatts,
-                TopUpThresholdPercent,
-                SinkBatteryStoredWattDays,
-                SinkBatteryCapacityWattDays
-            ),
-            PowerDiodeOperatingMode.OneWayValve => 1f,
-            _ => throw new ArgumentOutOfRangeException(nameof(OperatingMode), OperatingMode, null),
-        };
+        var modeGateFraction = ModeGateFraction(OperatingMode, 0f);
+
+        // The stricter supply a switched-off sink consumer has to fit within before it counts as
+        // demand, so it isn't started on power that's about to run out.
+        var sourceBatteryRestartWatts = PowerDiodeFlow.BatterySustainableWatts(
+            SourceBatteryStoredWattDays,
+            sourceReserveFloorWattDays + PowerDiodeFlow.RestartMarginWattDays
+        );
+        var restartSupplyWatts = PowerDiodeFlow.SourceSupplyWatts(
+            TargetWatts * ModeGateFraction(OperatingMode, PowerDiodeFlow.RestartMarginWattDays),
+            sourceBalanceExclSelf,
+            sourceBatteryRestartWatts
+        );
+        var sinkBalanceExclSelf = PowerDiodeFlow.SinkBalanceWithStartableConsumers(
+            NetBalanceExcluding(sinkNet, PowerTrader),
+            SwitchedOffDrawWatts(sinkNet, PowerTrader),
+            restartSupplyWatts
+        );
 
         CurrentFlowWatts = PowerDiodeFlow.ComputeFlowWatts(
             TargetWatts * modeGateFraction,
@@ -300,6 +300,27 @@ internal class CompPowerDiodeFeed : ThingComp
         partner.PowerTrader.PowerOutput = -CurrentFlowWatts;
     }
 
+    // overflowMarginWattDays only applies in Overflow mode, raising its threshold.
+    private float ModeGateFraction(PowerDiodeOperatingMode mode, float overflowMarginWattDays) =>
+        mode switch
+        {
+            PowerDiodeOperatingMode.Overflow => PowerDiodeFlow.OverflowGateFraction(
+                TargetWatts,
+                OverflowThresholdPercent,
+                SourceBatteryStoredWattDays,
+                SourceBatteryCapacityWattDays,
+                overflowMarginWattDays
+            ),
+            PowerDiodeOperatingMode.TopUp => PowerDiodeFlow.TopUpGateFraction(
+                TargetWatts,
+                TopUpThresholdPercent,
+                SinkBatteryStoredWattDays,
+                SinkBatteryCapacityWattDays
+            ),
+            PowerDiodeOperatingMode.OneWayValve => 1f,
+            _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null),
+        };
+
     private static float NetBalanceExcluding(PowerNet net, CompPowerTrader self)
     {
         var balance = 0f;
@@ -312,6 +333,19 @@ internal class CompPowerDiodeFeed : ThingComp
         }
         return balance;
     }
+
+    // The draw of each consumer vanilla PowerNet.PowerNetTick would switch on if the network had
+    // the surplus for it.
+    private static IEnumerable<float> SwitchedOffDrawWatts(PowerNet net, CompPowerTrader self) =>
+        net
+            .powerComps.Where(comp =>
+                comp != self
+                && !comp.PowerOn
+                && comp.PowerOutput < 0f
+                && FlickUtility.WantsToBeOn(comp.parent)
+                && !comp.parent.IsBrokenDown()
+            )
+            .Select(comp => -comp.PowerOutput);
 
     public override string CompInspectStringExtra() =>
         Partner == null ? "PowerDiode.NotLinked".Translate()

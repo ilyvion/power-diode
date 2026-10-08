@@ -325,6 +325,97 @@ internal sealed class PowerDiodeFlowTests
     }
 
     [Test]
+    public static void OverflowGateMarginRaisesTheThreshold()
+    {
+        var gate = PowerDiodeFlow.OverflowGateFraction(
+            capWatts: 1f,
+            overflowThresholdPercent: 80f,
+            sourceBatteryStoredWattDays: 804f,
+            sourceBatteryCapacityWattDays: 1000f,
+            marginWattDays: 5f
+        );
+        Expect.AreEqual(0f, gate);
+    }
+
+    [Test]
+    public static void SourceSupplyCombinesSurplusAndBatteryReserveUpToCap()
+    {
+        Expect.AreEqual(
+            150f,
+            PowerDiodeFlow.SourceSupplyWatts(
+                capWatts: 500f,
+                sourceNetBalanceExclSelf: 50f,
+                sourceBatteryReserveWatts: 100f
+            )
+        );
+        Expect.AreEqual(
+            120f,
+            PowerDiodeFlow.SourceSupplyWatts(
+                capWatts: 120f,
+                sourceNetBalanceExclSelf: 50f,
+                sourceBatteryReserveWatts: 100f
+            )
+        );
+    }
+
+    [Test]
+    public static void SourceSupplyIgnoresSourceDeficit()
+    {
+        var supply = PowerDiodeFlow.SourceSupplyWatts(
+            capWatts: 500f,
+            sourceNetBalanceExclSelf: -200f,
+            sourceBatteryReserveWatts: 100f
+        );
+        Expect.AreEqual(100f, supply);
+    }
+
+    // Regression: a switched-off consumer on an outlet's network with no other power source was
+    // never counted as demand, so the outlet fed nothing and vanilla never switched it on.
+    [Test]
+    public static void SwitchedOffConsumerCountsAsDemandWhenSupplyCoversIt()
+    {
+        var balance = PowerDiodeFlow.SinkBalanceWithStartableConsumers(
+            sinkNetBalanceExclSelf: 0f,
+            switchedOffDrawWatts: [30f],
+            restartSupplyWatts: 100f
+        );
+        Expect.AreEqual(-30f, balance);
+    }
+
+    [Test]
+    public static void SwitchedOffConsumerIsLeftOutWhenSupplyCannotCoverIt()
+    {
+        var balance = PowerDiodeFlow.SinkBalanceWithStartableConsumers(
+            sinkNetBalanceExclSelf: -50f,
+            switchedOffDrawWatts: [60f],
+            restartSupplyWatts: 100f
+        );
+        Expect.AreEqual(-50f, balance);
+    }
+
+    [Test]
+    public static void SwitchedOffConsumersAreAddedSmallestFirstWhileSupplyLasts()
+    {
+        var balance = PowerDiodeFlow.SinkBalanceWithStartableConsumers(
+            sinkNetBalanceExclSelf: 0f,
+            switchedOffDrawWatts: [80f, 30f, 40f],
+            restartSupplyWatts: 100f
+        );
+        Expect.AreEqual(-70f, balance);
+    }
+
+    [Test]
+    public static void SinkSurplusCountsTowardsSwitchedOffConsumers()
+    {
+        var balance = PowerDiodeFlow.SinkBalanceWithStartableConsumers(
+            sinkNetBalanceExclSelf: 50f,
+            switchedOffDrawWatts: [120f],
+            restartSupplyWatts: 70f
+        );
+        Expect.AreEqual(-70f, balance);
+    }
+
+    [Test]
     public static void TopUpGateIsZeroAtOrAboveThreshold()
     {
         Expect.AreEqual(

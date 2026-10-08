@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Wall-mounted power diode intakes and outlets, built into an existing wall to save space in compact setups. They work like the regular ones, take the place of a power conduit running under the wall, and can be paired with either variant. Each variant is in the same build menu dropdown as its regular counterpart.
 
+### Fixed
+
+- Power diode outlets now power consumers on their network even when that network has no battery or other power source. Previously such consumers stayed off for good, including after a brief power shortage on the intake side. A consumer that loses power because the intake side ran low only switches back on once the intake side can cover it again, so it doesn't keep flicking on and off.
+
 ## [0.2.1] - 2026-09-16
 
 ### Changed

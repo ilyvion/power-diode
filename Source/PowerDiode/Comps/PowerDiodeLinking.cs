@@ -4,38 +4,22 @@ internal static class PowerDiodeLinking
 {
     internal static void TryLinkFeedNode(CompPowerDiodeFeed feed)
     {
-        var draw = FindAdjacent<CompPowerDiodeDraw>(feed.parent);
-        if (draw == null)
+        // Only unpaired intakes are candidates, so dev-mode placement, which bypasses
+        // PlaceWorker checks, can never double-pair an intake.
+        var draw = FindAdjacent<CompPowerDiodeDraw>(feed.parent, d => d.Partner == null);
+        if (draw != null)
         {
-            return;
+            Link(draw, feed);
         }
-        if (draw.Partner != null)
-        {
-            // The PlaceWorker normally prevents this, but dev-mode placement can bypass
-            // PlaceWorker checks, so this has to hold up as an independent guarantee too.
-            Log.Error(
-                $"{feed.parent} tried to link to {draw.parent}, but it's already linked to {draw.Partner.parent}."
-            );
-            return;
-        }
-        Link(draw, feed);
     }
 
     internal static void TryLinkDrawNode(CompPowerDiodeDraw draw)
     {
-        var feed = FindAdjacent<CompPowerDiodeFeed>(draw.parent);
-        if (feed == null)
+        var feed = FindAdjacent<CompPowerDiodeFeed>(draw.parent, f => f.Partner == null);
+        if (feed != null)
         {
-            return;
+            Link(draw, feed);
         }
-        if (feed.Partner != null)
-        {
-            Log.Error(
-                $"{draw.parent} tried to link to {feed.parent}, but it's already linked to {feed.Partner.parent}."
-            );
-            return;
-        }
-        Link(draw, feed);
     }
 
     private static void Link(CompPowerDiodeDraw draw, CompPowerDiodeFeed feed)
@@ -44,7 +28,7 @@ internal static class PowerDiodeLinking
         feed.Partner = draw;
     }
 
-    internal static T? FindAdjacent<T>(Thing thing)
+    internal static T? FindAdjacent<T>(Thing thing, Predicate<T> validator)
         where T : ThingComp
     {
         var map = thing.Map;
@@ -60,7 +44,7 @@ internal static class PowerDiodeLinking
                 if (candidate is ThingWithComps thingWithComps)
                 {
                     var comp = thingWithComps.GetComp<T>();
-                    if (comp != null)
+                    if (comp != null && validator(comp))
                     {
                         return comp;
                     }

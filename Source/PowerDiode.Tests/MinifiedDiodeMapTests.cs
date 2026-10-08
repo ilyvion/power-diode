@@ -196,6 +196,104 @@ internal sealed class MinifiedDiodeMapTests
         Expect.ReferencesAreEqual(draw, feed.Partner);
     }
 
+    private (CompPowerDiodeDraw Draw, CompPowerDiodeFeed Feed) SpawnPair(
+        IntVec3 intakeCell,
+        IntVec3 outletCell
+    )
+    {
+        var draw = Spawn("PowerDiode_DrawNode", intakeCell).GetComp<CompPowerDiodeDraw>();
+        var feed = Spawn("PowerDiode_FeedNode", outletCell).GetComp<CompPowerDiodeFeed>();
+        Expect.ReferencesAreEqual(feed, draw.Partner);
+        return (draw, feed);
+    }
+
+    private static void ExpectPaired(CompPowerDiodeDraw draw, CompPowerDiodeFeed feed)
+    {
+        Expect.ReferencesAreEqual(feed, draw.Partner);
+        Expect.ReferencesAreEqual(draw, feed.Partner);
+    }
+
+    // GenAdj.CardinalDirections checks North before South, so this picks which of two
+    // neighbours of a cell the linking code reaches first.
+    private static (IntVec3 PairedDir, IntVec3 UnpairedDir) NeighbourDirections(
+        bool pairedNeighbourCheckedFirst
+    ) =>
+        pairedNeighbourCheckedFirst
+            ? (IntVec3.North, IntVec3.South)
+            : (IntVec3.South, IntVec3.North);
+
+    [Test]
+    public void IntakeNextToOnlyAPairedOutletStaysUnpaired()
+    {
+        var (draw, feed) = SpawnPair(Origin, Origin + IntVec3.East);
+
+        var newDraw = Spawn("PowerDiode_DrawNode", Origin + (IntVec3.East * 2))
+            .GetComp<CompPowerDiodeDraw>();
+
+        Expect.IsNull(newDraw.Partner);
+        ExpectPaired(draw, feed);
+    }
+
+    [Test]
+    public void IntakeBetweenAPairedAndAnUnpairedOutletPairsWithTheUnpairedOne(
+        [Parameters(true, false)] bool pairedNeighbourCheckedFirst
+    )
+    {
+        var (pairedDir, unpairedDir) = NeighbourDirections(pairedNeighbourCheckedFirst);
+        var cell = Origin;
+        var (pairedDraw, pairedFeed) = SpawnPair(cell + (pairedDir * 2), cell + pairedDir);
+        var (formerDraw, unpairedFeed) = SpawnPair(cell + (unpairedDir * 2), cell + unpairedDir);
+        _ = formerDraw.parent.MakeMinified();
+        Expect.IsNull(unpairedFeed.Partner);
+
+        var newDraw = Spawn("PowerDiode_DrawNode", cell).GetComp<CompPowerDiodeDraw>();
+
+        ExpectPaired(newDraw, unpairedFeed);
+        ExpectPaired(pairedDraw, pairedFeed);
+    }
+
+    [Test]
+    public void OutletBetweenAPairedAndAnUnpairedIntakePairsWithTheUnpairedOne(
+        [Parameters(true, false)] bool pairedNeighbourCheckedFirst
+    )
+    {
+        var (pairedDir, unpairedDir) = NeighbourDirections(pairedNeighbourCheckedFirst);
+        var cell = Origin;
+        var (pairedDraw, pairedFeed) = SpawnPair(cell + pairedDir, cell + (pairedDir * 2));
+        var unpairedDraw = Spawn("PowerDiode_DrawNode", cell + unpairedDir)
+            .GetComp<CompPowerDiodeDraw>();
+        var minified = ThingMaker
+            .MakeThing(DefDatabase<ThingDef>.GetNamed("PowerDiode_FeedNode"))
+            .MakeMinified();
+        Expect.IsTrue(CanInstallAt(minified.InnerThing, cell, minified).Accepted);
+
+        var newFeed = Spawn("PowerDiode_FeedNode", cell).GetComp<CompPowerDiodeFeed>();
+
+        ExpectPaired(unpairedDraw, newFeed);
+        ExpectPaired(pairedDraw, pairedFeed);
+    }
+
+    [Test]
+    public void OutletReinstalledBetweenAPairedAndAnUnpairedIntakePairsWithTheUnpairedOne(
+        [Parameters(true, false)] bool pairedNeighbourCheckedFirst
+    )
+    {
+        var (pairedDir, unpairedDir) = NeighbourDirections(pairedNeighbourCheckedFirst);
+        var cell = Origin;
+        var (pairedDraw, pairedFeed) = SpawnPair(cell + pairedDir, cell + (pairedDir * 2));
+        var unpairedDraw = Spawn("PowerDiode_DrawNode", cell + unpairedDir)
+            .GetComp<CompPowerDiodeDraw>();
+        var farCell = cell + (IntVec3.East * 5);
+        var (oldDraw, movedFeed) = SpawnPair(farCell, farCell + IntVec3.East);
+        Expect.IsTrue(CanInstallAt(movedFeed.parent, cell, movedFeed.parent).Accepted);
+
+        _ = Install(movedFeed.parent.MakeMinified(), cell);
+
+        Expect.IsNull(oldDraw.Partner);
+        ExpectPaired(unpairedDraw, movedFeed);
+        ExpectPaired(pairedDraw, pairedFeed);
+    }
+
     [Test]
     public void NewlyBuiltOutletStartsWithDefaultSettings()
     {

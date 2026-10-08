@@ -71,4 +71,40 @@ internal sealed class GraphReachabilityTests
         Expect.AreEqual(2, reachable.Count);
         Expect.IsFalse(reachable.Contains('C'));
     }
+
+    [Test]
+    public static void RootOutsideTheAllowedSetIsStillReturned()
+    {
+        var graph = LineGraph();
+
+        var reachable = GraphReachability.ReachableWithoutCrossingBlockedEdges(
+            'A',
+            [],
+            node => Adjacent(graph, node),
+            (_, _) => false
+        );
+
+        Expect.AreEqual(1, reachable.Count);
+        Expect.IsTrue(reachable.Contains('A'));
+    }
+
+    [Test]
+    public static void TerminatesOnACyclicGraph()
+    {
+        var graph = new Dictionary<char, char[]>
+        {
+            ['A'] = ['B', 'C'],
+            ['B'] = ['A', 'C'],
+            ['C'] = ['A', 'B'],
+        };
+
+        var reachable = GraphReachability.ReachableWithoutCrossingBlockedEdges(
+            'A',
+            ['A', 'B', 'C'],
+            node => Adjacent(graph, node),
+            (_, _) => false
+        );
+
+        Expect.AreEqual(3, reachable.Count);
+    }
 }

@@ -205,6 +205,10 @@ internal static class PowerDiodeFlow
         return Mathf.Clamp01(sustainableWatts / capWatts);
     }
 
+    // How full a network's batteries are, from 0 to 1; 0 when it has no battery capacity.
+    internal static float StoredFraction(float storedWattDays, float capacityWattDays) =>
+        capacityWattDays <= 0f ? 0f : Mathf.Clamp01(storedWattDays / capacityWattDays);
+
     // The flow a diode feeds this tick.
     public static float TickFlowWatts(FlowTickInputs inputs)
     {

@@ -99,14 +99,10 @@ internal class CompPowerDiodeFeed : ThingComp
     internal float SinkBatteryCapacityWattDays { get; private set; }
 
     internal float SourceBatteryStoredPercent =>
-        SourceBatteryCapacityWattDays <= 0f
-            ? 0f
-            : Mathf.Clamp01(SourceBatteryStoredWattDays / SourceBatteryCapacityWattDays);
+        PowerDiodeFlow.StoredFraction(SourceBatteryStoredWattDays, SourceBatteryCapacityWattDays);
 
     internal float SinkBatteryStoredPercent =>
-        SinkBatteryCapacityWattDays <= 0f
-            ? 0f
-            : Mathf.Clamp01(SinkBatteryStoredWattDays / SinkBatteryCapacityWattDays);
+        PowerDiodeFlow.StoredFraction(SinkBatteryStoredWattDays, SinkBatteryCapacityWattDays);
 
     // True when the feed node's own power net and its partner draw node's power net are the same
     // PowerNet - i.e. some other connection already joins the two sides the diode is supposed to

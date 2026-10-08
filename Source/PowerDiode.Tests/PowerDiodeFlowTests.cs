@@ -252,6 +252,34 @@ internal sealed class PowerDiodeFlowTests
     }
 
     [Test]
+    public static void PercentageSourceReserveFloorIsZeroWithNoBatteryCapacity()
+    {
+        var floor = PowerDiodeFlow.SourceReserveFloorWattDays(
+            mode: PowerDiodeOperatingMode.OneWayValve,
+            reserveWattDays: 50f,
+            reserveIsPercentage: true,
+            reservePercent: 20f,
+            sourceBatteryCapacityWattDays: 0f
+        );
+        Expect.AreEqual(0f, floor);
+    }
+
+    // A 100% reserve keeps the whole battery untouchable, so even a full battery supplies nothing.
+    [Test]
+    public static void FullPercentageSourceReserveLeavesAFullBatteryNothingToGive()
+    {
+        var floor = PowerDiodeFlow.SourceReserveFloorWattDays(
+            mode: PowerDiodeOperatingMode.OneWayValve,
+            reserveWattDays: 50f,
+            reserveIsPercentage: true,
+            reservePercent: 100f,
+            sourceBatteryCapacityWattDays: 1000f
+        );
+        Expect.AreEqual(1000f, floor);
+        Expect.AreEqual(0f, PowerDiodeFlow.BatterySustainableWatts(1000f, floor));
+    }
+
+    [Test]
     public static void SourceReserveFloorIsZeroInOverflowMode()
     {
         var floor = PowerDiodeFlow.SourceReserveFloorWattDays(
@@ -703,6 +731,21 @@ internal sealed class PowerDiodeFlowTests
                 brokenDown: false
             )
         );
+
+    [Test]
+    public static void StoredFractionIsZeroWithNoOrNegativeCapacity()
+    {
+        Expect.AreEqual(0f, PowerDiodeFlow.StoredFraction(10f, 0f), "zero capacity");
+        Expect.AreEqual(0f, PowerDiodeFlow.StoredFraction(10f, -100f), "negative capacity");
+    }
+
+    [Test]
+    public static void StoredFractionIsClampedToOne() =>
+        Expect.AreEqual(1f, PowerDiodeFlow.StoredFraction(1500f, 1000f));
+
+    [Test]
+    public static void StoredFractionIsStoredOverCapacity() =>
+        Expect.AreEqual(0.25f, PowerDiodeFlow.StoredFraction(250f, 1000f));
 
     [Test]
     public static void DiodesOwnTraderIsNotStartable() =>

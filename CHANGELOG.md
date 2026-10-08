@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Devices on a power diode intake's network that are waiting for power, such as newly built ones or ones that lost power, now switch on as long as that network's own power covers them. Previously the diode could take all of the spare power for the outlet side, leaving them off. While such a device is waiting, the diode also stops drawing from the intake network's batteries once they're down to 5 Wd, the charge they need before anything can switch on.
 - A power diode outlet's inspect text now says it is receiving power from its intake, rather than wrongly saying it is feeding the intake.
 - A power diode intake or outlet placed next to both an already-paired diode building and an unpaired one now pairs with the unpaired one. Previously it could stay unpaired and log an error. An intake placed next to only an already-paired outlet now simply stays unpaired, without logging an error.
+- Loading a save no longer changes which power diode intakes and outlets are paired. Previously an unpaired intake and outlet next to each other could pair up on load, and a building could come back paired with a different neighbour than before.
 
 ## [0.2.1] - 2026-09-16
 

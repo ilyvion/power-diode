@@ -95,6 +95,25 @@ internal static class PowerDiodeLinking
         );
     }
 
+    // Pairings are restored from the save rather than re-paired on load, except in saves made
+    // before pairings were saved, which have no pairingSaved flag.
+    internal static void ExposePairingSaved(ref bool pairingSaved)
+    {
+        if (Scribe.mode == LoadSaveMode.Saving)
+        {
+            pairingSaved = true;
+        }
+        Scribe_Values.Look(ref pairingSaved, "pairingSaved");
+    }
+
+    internal static void LinkLoaded(CompPowerDiodeDraw draw, CompPowerDiodeFeed feed)
+    {
+        if (draw.Partner == null && feed.Partner == null)
+        {
+            Link(draw, feed);
+        }
+    }
+
     private static T? FindAdjacent<T>(IntVec3 center, Map map, Predicate<T> validator)
         where T : ThingComp => AllAdjacent(center, map, validator).FirstOrDefault();
 

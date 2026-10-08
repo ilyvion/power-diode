@@ -7,6 +7,8 @@ namespace PowerDiode;
 [HotSwappable]
 internal class CompPowerDiodeDraw : ThingComp
 {
+    private bool pairingSaved;
+
     internal CompPowerDiodeFeed? Partner { get; set; }
 
     internal CompPowerTrader PowerTrader
@@ -21,10 +23,17 @@ internal class CompPowerDiodeDraw : ThingComp
     public override void PostSpawnSetup(bool respawningAfterLoad)
     {
         base.PostSpawnSetup(respawningAfterLoad);
-        if (Partner == null)
+        if (Partner == null && !(respawningAfterLoad && pairingSaved))
         {
             PowerDiodeLinking.TryLinkDrawNode(this);
         }
+    }
+
+    // The pairing itself is saved by the outlet.
+    public override void PostExposeData()
+    {
+        base.PostExposeData();
+        PowerDiodeLinking.ExposePairingSaved(ref pairingSaved);
     }
 
     public override void PostDeSpawn(Map map, DestroyMode mode = DestroyMode.Vanish)

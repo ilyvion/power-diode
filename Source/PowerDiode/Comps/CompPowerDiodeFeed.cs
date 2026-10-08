@@ -13,6 +13,7 @@ internal class CompPowerDiodeFeed : ThingComp
     private float overflowThresholdPercent;
     private float topUpThresholdPercent;
     private PowerDiodeOperatingMode operatingMode;
+    private bool pairingSaved;
 
     // Gizmo_SetDiodeWattage/Gizmo_SetDiodeReserve/Gizmo_SetDiodeOverflowThreshold/
     // Gizmo_SetDiodeTopUpThreshold are recreated every GUI frame, so their drag state can't live
@@ -138,7 +139,7 @@ internal class CompPowerDiodeFeed : ThingComp
     public override void PostSpawnSetup(bool respawningAfterLoad)
     {
         base.PostSpawnSetup(respawningAfterLoad);
-        if (Partner == null)
+        if (Partner == null && !(respawningAfterLoad && pairingSaved))
         {
             PowerDiodeLinking.TryLinkFeedNode(this);
         }
@@ -171,6 +172,17 @@ internal class CompPowerDiodeFeed : ThingComp
             DefaultTopUpThresholdPercent
         );
         Scribe_Values.Look(ref operatingMode, "operatingMode", PowerDiodeOperatingMode.OneWayValve);
+
+        PowerDiodeLinking.ExposePairingSaved(ref pairingSaved);
+        var partnerThing = Partner?.parent;
+        Scribe_References.Look(ref partnerThing, "partner");
+        if (
+            Scribe.mode == LoadSaveMode.ResolvingCrossRefs
+            && partnerThing?.GetComp<CompPowerDiodeDraw>() is { } draw
+        )
+        {
+            PowerDiodeLinking.LinkLoaded(draw, this);
+        }
     }
 
     public override void PostDeSpawn(Map map, DestroyMode mode = DestroyMode.Vanish)

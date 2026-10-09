@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-09
+
 ### Added
 
 - Wall-mounted power diode intakes and outlets, built into an existing wall to save space in compact setups. They work like the regular ones, take the place of a power conduit running under the wall, and can be paired with either variant. Each variant is in the same build menu dropdown as its regular counterpart.
@@ -57,7 +59,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The power diode: a pair of buildings, a power diode intake and a power diode outlet, that let power flow one-way between two otherwise-separate power networks. Build an intake on the network you want to draw from and an outlet directly next to it on the network you want to feed; the outlet has a wattage cap slider and only ever feeds as much as its network currently needs (including charging batteries), and never more than the intake's network has to spare.
 
-[Unreleased]: https://github.com/ilyvion/power-diode/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/ilyvion/power-diode/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/ilyvion/power-diode/compare/v0.2.1..v0.3.0
 [0.2.1]: https://github.com/ilyvion/power-diode/compare/v0.2.0..v0.2.1
 [0.2.0]: https://github.com/ilyvion/power-diode/compare/v0.1.0..v0.2.0
 [0.1.0]: https://github.com/ilyvion/power-diode/releases/tag/v0.1.0

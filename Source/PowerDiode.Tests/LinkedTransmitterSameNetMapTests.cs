@@ -37,6 +37,20 @@ internal sealed class LinkedTransmitterSameNetMapTests
         return thing;
     }
 
+    private Blueprint_Build PlaceBlueprint(string defName, IntVec3 cell)
+    {
+        var blueprint = GenConstruct.PlaceBlueprintForBuild(
+            DefDatabase<ThingDef>.GetNamed(defName),
+            cell,
+            Map,
+            Rot4.North,
+            Faction.OfPlayer,
+            null
+        );
+        spawned.Add(blueprint);
+        return blueprint;
+    }
+
     private static bool RestrictToSameNet(IntVec3 c, Thing parent, bool result)
     {
         Graphic_LinkedTransmitter_ShouldLinkWith.RestrictToSameNet(c, parent, ref result);
@@ -99,6 +113,30 @@ internal sealed class LinkedTransmitterSameNetMapTests
         var (westConduit, intake, _) = SpawnLinkedRow();
 
         Expect.IsFalse(RestrictToSameNet(intake.Position, westConduit, false));
+    }
+
+    [Test]
+    public void ConduitAndAdjacentConduitBlueprintLinkBothWays()
+    {
+        var conduit = Spawn("PowerConduit", Origin);
+        var blueprint = PlaceBlueprint("PowerConduit", Origin + IntVec3.East);
+        Map.powerNetManager.UpdatePowerNetsAndConnections_First();
+        Expect.IsNotNull(Map.powerNetGrid.TransmittedPowerNetAt(conduit.Position));
+        Expect.IsNull(Map.powerNetGrid.TransmittedPowerNetAt(blueprint.Position));
+        var graphic = new Graphic_LinkedTransmitter(conduit.Graphic);
+
+        Expect.IsTrue(graphic.ShouldLinkWith(blueprint.Position, conduit));
+        Expect.IsTrue(graphic.ShouldLinkWith(conduit.Position, blueprint));
+    }
+
+    [Test]
+    public void DiodeBuildingNextToANonDiodeCellOnAnotherNetKeepsTheVanillaResult()
+    {
+        var (_, intake, _) = SpawnLinkedRow();
+        var blueprint = PlaceBlueprint("PowerConduit", Origin + IntVec3.North);
+        Expect.IsNull(Map.powerNetGrid.TransmittedPowerNetAt(blueprint.Position));
+
+        Expect.IsTrue(RestrictToSameNet(blueprint.Position, intake, true));
     }
 
     // Confirms the Harmony patch is applied: vanilla links to any cell with a power net.

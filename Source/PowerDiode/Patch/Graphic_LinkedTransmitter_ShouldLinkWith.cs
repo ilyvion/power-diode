@@ -3,11 +3,10 @@ namespace PowerDiode.Patch;
 // Graphic_LinkedTransmitter/Graphic_LinkedTransmitterOverlay decide whether a wire tile visually
 // links to a neighboring cell purely by whether *some* PowerNet is registered there
 // (PowerNetGrid.TransmittedPowerNetAt(c) != null) - not whether it's the *same* net as the tile
-// doing the linking. In vanilla this distinction never matters, since any two cardinally-adjacent
-// power-transmitting things are always the same net. A diode link breaks that invariant: once
-// PowerNetMaker_ContiguousPowerBuildings has split a linked pair into two separate PowerNets, the
-// wire still rendered as one continuous, uninterrupted line straight across the pair without this
-// patch.
+// doing the linking. A diode link splits a linked pair into two separate PowerNets (see
+// PowerNetMaker_ContiguousPowerBuildings), so without this patch the wire still rendered as one
+// continuous line straight across the pair. Only links between two diode buildings on different
+// nets are cut.
 [HarmonyPatch(typeof(Graphic_LinkedTransmitter), nameof(Graphic_LinkedTransmitter.ShouldLinkWith))]
 internal static class Graphic_LinkedTransmitter_ShouldLinkWith
 {
@@ -16,7 +15,11 @@ internal static class Graphic_LinkedTransmitter_ShouldLinkWith
 
     internal static void RestrictToSameNet(IntVec3 c, Thing parent, ref bool __result)
     {
-        if (!__result)
+        if (
+            !__result
+            || !IsDiodeBuilding(parent)
+            || !c.GetThingList(parent.Map).Any(IsDiodeBuilding)
+        )
         {
             return;
         }
@@ -26,6 +29,13 @@ internal static class Graphic_LinkedTransmitter_ShouldLinkWith
             __result = false;
         }
     }
+
+    private static bool IsDiodeBuilding(Thing thing) =>
+        thing is ThingWithComps thingWithComps
+        && (
+            thingWithComps.GetComp<CompPowerDiodeDraw>() != null
+            || thingWithComps.GetComp<CompPowerDiodeFeed>() != null
+        );
 }
 
 [HarmonyPatch(

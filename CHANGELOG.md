@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Setting the same minimum and maximum for the wattage cap or the battery reserve in the mod settings no longer breaks the outlets' setting. The matching slider is now hidden, since there is nothing to choose.
 - The mod settings window now shows your saved minimum and maximum values after restarting the game. Previously it showed the defaults, even though your saved values were still the ones in effect.
 - A power diode outlet no longer keeps feeding its network while its intake is switched off, such as during a power shortage on the intake side or right after the intake is built. Previously the outlet side got that power for free, without the intake network supplying it.
+- Power conduit blueprints connect visually to the conduits next to them again. Previously, with Power Diode installed, there was a gap between a built conduit and a blueprint placed next to it, on every map.
 
 ## [0.2.1] - 2026-09-16
 

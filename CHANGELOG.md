@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The game no longer logs a warning about Power Diode's gizmo icons not being loaded on the main thread when it starts.
 - Setting the same minimum and maximum for the wattage cap or the battery reserve in the mod settings no longer breaks the outlets' setting. The matching slider is now hidden, since there is nothing to choose.
 - The mod settings window now shows your saved minimum and maximum values after restarting the game. Previously it showed the defaults, even though your saved values were still the ones in effect.
+- A power diode outlet no longer keeps feeding its network while its intake is switched off, such as during a power shortage on the intake side or right after the intake is built. Previously the outlet side got that power for free, without the intake network supplying it.
 
 ## [0.2.1] - 2026-09-16
 

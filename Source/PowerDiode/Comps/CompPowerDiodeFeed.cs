@@ -283,31 +283,39 @@ internal class CompPowerDiodeFeed : ThingComp
             battery.Props.storedEnergyMax
         );
 
-        CurrentFlowWatts = PowerDiodeFlow.TickFlowWatts(
-            new(
-                Mode: OperatingMode,
-                TargetWatts: TargetWatts,
-                ReserveWattDays: ReserveWattDays,
-                ReserveIsPercentage: PowerDiodeMod.Settings.ReserveIsPercentage,
-                ReservePercent: ReservePercent,
-                OverflowThresholdPercent: OverflowThresholdPercent,
-                TopUpThresholdPercent: TopUpThresholdPercent,
-                SourceRawBalanceExclSelf: NetBalanceExcluding(sourceNet, partner.PowerTrader),
-                SourceSwitchedOffDrawWatts:
-                [
-                    .. SwitchedOffDrawWatts(sourceNet, partner.PowerTrader),
-                ],
-                SinkRawBalanceExclSelf: NetBalanceExcluding(sinkNet, PowerTrader),
-                SinkSwitchedOffDrawWatts: [.. SwitchedOffDrawWatts(sinkNet, PowerTrader)],
-                SinkAcceptWattDays: sinkNet.batteryComps.Sum(battery =>
-                    Math.Max(0f, battery.AmountCanAccept)
-                ),
-                SourceStoredWattDays: SourceBatteryStoredWattDays,
-                SourceCapacityWattDays: SourceBatteryCapacityWattDays,
-                SinkStoredWattDays: SinkBatteryStoredWattDays,
-                SinkCapacityWattDays: SinkBatteryCapacityWattDays
-            )
-        );
+        // Vanilla ignores a switched-off trader's output, so feeding while either side is off
+        // would create power from nothing (or destroy it).
+        CurrentFlowWatts =
+            !PowerTrader.PowerOn || !partner.PowerTrader.PowerOn
+                ? 0f
+                : PowerDiodeFlow.TickFlowWatts(
+                    new(
+                        Mode: OperatingMode,
+                        TargetWatts: TargetWatts,
+                        ReserveWattDays: ReserveWattDays,
+                        ReserveIsPercentage: PowerDiodeMod.Settings.ReserveIsPercentage,
+                        ReservePercent: ReservePercent,
+                        OverflowThresholdPercent: OverflowThresholdPercent,
+                        TopUpThresholdPercent: TopUpThresholdPercent,
+                        SourceRawBalanceExclSelf: NetBalanceExcluding(
+                            sourceNet,
+                            partner.PowerTrader
+                        ),
+                        SourceSwitchedOffDrawWatts:
+                        [
+                            .. SwitchedOffDrawWatts(sourceNet, partner.PowerTrader),
+                        ],
+                        SinkRawBalanceExclSelf: NetBalanceExcluding(sinkNet, PowerTrader),
+                        SinkSwitchedOffDrawWatts: [.. SwitchedOffDrawWatts(sinkNet, PowerTrader)],
+                        SinkAcceptWattDays: sinkNet.batteryComps.Sum(battery =>
+                            Math.Max(0f, battery.AmountCanAccept)
+                        ),
+                        SourceStoredWattDays: SourceBatteryStoredWattDays,
+                        SourceCapacityWattDays: SourceBatteryCapacityWattDays,
+                        SinkStoredWattDays: SinkBatteryStoredWattDays,
+                        SinkCapacityWattDays: SinkBatteryCapacityWattDays
+                    )
+                );
 
         PowerTrader.PowerOutput = CurrentFlowWatts;
         partner.PowerTrader.PowerOutput = -CurrentFlowWatts;

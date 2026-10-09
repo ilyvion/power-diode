@@ -403,7 +403,7 @@ internal class CompPowerDiodeFeed : ThingComp
                 yield return linkGizmo;
             }
         }
-        yield return CreateModeGizmo();
+        yield return new Command_SetDiodeOperatingMode(this);
         switch (OperatingMode)
         {
             case PowerDiodeOperatingMode.Overflow:
@@ -425,23 +425,4 @@ internal class CompPowerDiodeFeed : ThingComp
             yield return new Gizmo_SetDiodeWattage(this);
         }
     }
-
-    private Command_Action CreateModeGizmo() =>
-        new()
-        {
-            defaultLabel = "PowerDiode.OperatingModeGizmoLabel".Translate(OperatingMode.Label()),
-            defaultDesc = OperatingMode.Description(),
-            icon = OperatingMode.Icon(),
-            action = () =>
-                Find.WindowStack.Add(
-                    new FloatMenu([
-                        .. Enum.GetValues(typeof(PowerDiodeOperatingMode))
-                            .Cast<PowerDiodeOperatingMode>()
-                            .Select(mode => new FloatMenuOption(
-                                mode.Label(),
-                                () => OperatingMode = mode
-                            )),
-                    ])
-                ),
-        };
 }

@@ -59,13 +59,19 @@ internal sealed class OperatingModeGizmoTests
         return building;
     }
 
-    private static Command_Action? ModeGizmo(CompPowerDiodeFeed feed) =>
+    private static Command_SetDiodeOperatingMode? ModeGizmo(CompPowerDiodeFeed feed) =>
         feed.CompGetGizmosExtra()
-            .OfType<Command_Action>()
+            .OfType<Command_SetDiodeOperatingMode>()
             .FirstOrDefault(gizmo =>
                 gizmo.defaultLabel
                 == "PowerDiode.OperatingModeGizmoLabel".Translate(feed.OperatingMode.Label())
             );
+
+    private static FloatMenu? OpenModeMenu(Command_SetDiodeOperatingMode modeGizmo)
+    {
+        modeGizmo.ProcessInput(new Event());
+        return Find.WindowStack.WindowOfType<FloatMenu>();
+    }
 
     private static readonly PowerDiodeOperatingMode[] AllModes =
     [
@@ -121,9 +127,12 @@ internal sealed class OperatingModeGizmoTests
 
         var modeGizmo = ModeGizmo(feed);
         Expect.IsNotNull(modeGizmo, "mode gizmo");
-        modeGizmo?.action();
+        if (modeGizmo == null)
+        {
+            return;
+        }
 
-        var menu = Find.WindowStack.WindowOfType<FloatMenu>();
+        var menu = OpenModeMenu(modeGizmo);
         Expect.IsNotNull(menu, "mode menu");
         if (menu == null)
         {
@@ -142,5 +151,39 @@ internal sealed class OperatingModeGizmoTests
         menu.options.First(option => option.Label == chosenMode.Label()).action();
 
         Expect.AreEqual(chosenMode, feed.OperatingMode);
+    }
+
+    // Outlets in the same mode share one grouped gizmo; the gizmo grid hands the clicked gizmo
+    // the rest of its group through InheritInteractionsFrom.
+    [Test]
+    public static void GroupedModeMenuSetsTheChosenModeOnEverySelectedOutlet()
+    {
+        var feeds = new[] { MakePairedFeedComp(), MakePairedFeedComp(), MakePairedFeedComp() };
+        var gizmos = feeds.Select(ModeGizmo).OfType<Command_SetDiodeOperatingMode>().ToList();
+        Expect.AreEqual(feeds.Length, gizmos.Count, "mode gizmos");
+        if (gizmos.Count != feeds.Length)
+        {
+            return;
+        }
+        var clicked = gizmos[0];
+        foreach (var other in gizmos.Skip(1))
+        {
+            Expect.IsTrue(clicked.GroupsWith(other), "gizmos group");
+            Expect.IsFalse(clicked.InheritInteractionsFrom(other), "others don't open menus");
+        }
+
+        var menu = OpenModeMenu(clicked);
+        Expect.IsNotNull(menu, "mode menu");
+        if (menu == null)
+        {
+            return;
+        }
+        menu.options.First(option => option.Label == PowerDiodeOperatingMode.TopUp.Label())
+            .action();
+
+        foreach (var feed in feeds)
+        {
+            Expect.AreEqual(PowerDiodeOperatingMode.TopUp, feed.OperatingMode);
+        }
     }
 }

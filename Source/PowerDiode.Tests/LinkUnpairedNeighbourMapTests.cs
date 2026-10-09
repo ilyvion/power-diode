@@ -56,13 +56,18 @@ internal sealed class LinkUnpairedNeighbourMapTests
 
     // An intake and an outlet left side by side, both unpaired: the intake paired with another
     // outlet when it was built, and that outlet has since been uninstalled.
-    private (CompPowerDiodeDraw Draw, CompPowerDiodeFeed Feed) SpawnStrandedNeighbours()
+    private (CompPowerDiodeDraw Draw, CompPowerDiodeFeed Feed) SpawnStrandedNeighbours() =>
+        SpawnStrandedNeighbours(Origin);
+
+    private (CompPowerDiodeDraw Draw, CompPowerDiodeFeed Feed) SpawnStrandedNeighbours(
+        IntVec3 origin
+    )
     {
-        var draw = Spawn("PowerDiode_DrawNode", Origin).GetComp<CompPowerDiodeDraw>();
-        var formerFeed = Spawn("PowerDiode_FeedNode", Origin + IntVec3.East)
+        var draw = Spawn("PowerDiode_DrawNode", origin).GetComp<CompPowerDiodeDraw>();
+        var formerFeed = Spawn("PowerDiode_FeedNode", origin + IntVec3.East)
             .GetComp<CompPowerDiodeFeed>();
         ExpectPaired(draw, formerFeed);
-        var feed = Spawn("PowerDiode_FeedNode", Origin + IntVec3.West)
+        var feed = Spawn("PowerDiode_FeedNode", origin + IntVec3.West)
             .GetComp<CompPowerDiodeFeed>();
         Expect.IsNull(feed.Partner);
         _ = formerFeed.parent.MakeMinified();
@@ -203,5 +208,17 @@ internal sealed class LinkUnpairedNeighbourMapTests
 
         ExpectPaired(draw, chosen);
         Expect.IsNull(other.Partner);
+    }
+
+    // Each selected building has its own candidates, so their link gizmos must stay separate
+    // rather than merge into one button whose menu only links one of them.
+    [Test]
+    public void LinkGizmosOfSeveralSelectedDiodesDoNotGroup()
+    {
+        var (draw, feed) = SpawnStrandedNeighbours();
+        var (otherDraw, otherFeed) = SpawnStrandedNeighbours(Origin + (IntVec3.North * 5));
+
+        Expect.IsFalse(IntakeLinkGizmo(draw)!.GroupsWith(IntakeLinkGizmo(otherDraw)!), "intakes");
+        Expect.IsFalse(OutletLinkGizmo(feed)!.GroupsWith(OutletLinkGizmo(otherFeed)!), "outlets");
     }
 }

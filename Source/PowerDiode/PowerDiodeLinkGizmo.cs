@@ -1,7 +1,8 @@
 namespace PowerDiode;
 
 // Offered on an unpaired diode building next to unpaired partners it doesn't pair with on its own,
-// since pairing only happens automatically when a diode building spawns.
+// since pairing only happens automatically when a diode building spawns. Each building's candidates
+// differ, so the gizmo never groups across a multi-selection.
 internal static class PowerDiodeLinkGizmo
 {
     internal static Command_Action? Create<T>(
@@ -19,6 +20,7 @@ internal static class PowerDiodeLinkGizmo
                 defaultLabel = label,
                 defaultDesc = description,
                 icon = Resources.LinkNeighbourIcon,
+                groupable = false,
                 onHover = () =>
                 {
                     foreach (var candidate in candidates)

@@ -82,10 +82,21 @@ internal static class PowerDiodeLinking
         ];
 
     // Links two already-spawned diode buildings. Unpaired neighbours share one power net, so the
-    // nets around the outlet are rebuilt for the new link to split them apart.
+    // nets around the outlet are rebuilt for the new link to split them apart. The link gizmo's
+    // float menu stays open while the game runs, so either building may have since been paired,
+    // despawned or moved.
     internal static void LinkSpawned(CompPowerDiodeDraw draw, CompPowerDiodeFeed feed)
     {
         if (draw.Partner != null || feed.Partner != null)
+        {
+            return;
+        }
+        if (
+            !draw.parent.Spawned
+            || !feed.parent.Spawned
+            || draw.parent.Map != feed.parent.Map
+            || !draw.parent.Position.AdjacentToCardinal(feed.parent.Position)
+        )
         {
             return;
         }

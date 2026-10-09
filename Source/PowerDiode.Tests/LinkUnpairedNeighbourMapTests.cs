@@ -210,6 +210,63 @@ internal sealed class LinkUnpairedNeighbourMapTests
         Expect.IsNull(other.Partner);
     }
 
+    // The menu stays open while the game runs, so the chosen outlet may be gone by the time its
+    // option is picked.
+    [Test]
+    public void IntakeLinkGizmoMenuIgnoresAnOutletUninstalledWhileItWasOpen()
+    {
+        var (draw, westFeed) = SpawnStrandedNeighbours();
+        var eastFeed = Spawn("PowerDiode_FeedNode", Origin + IntVec3.East)
+            .GetComp<CompPowerDiodeFeed>();
+        // Spawning pairs the new outlet with the unpaired intake, so unpair it again.
+        eastFeed.Unlink();
+        IntakeLinkGizmo(draw)!.action();
+        var menu = Find.WindowStack.WindowOfType<FloatMenu>();
+        Expect.IsNotNull(menu);
+        var westOption = menu?.options.FirstOrDefault(option =>
+            option.Label == OptionLabel(westFeed, Rot4.West)
+        );
+        Expect.IsNotNull(westOption);
+        if (westOption == null)
+        {
+            return;
+        }
+
+        _ = westFeed.parent.MakeMinified();
+        westOption.action();
+
+        Expect.IsNull(draw.Partner);
+        Expect.IsNull(westFeed.Partner);
+    }
+
+    [Test]
+    public void LinkSpawnedRefusesADespawnedIntake()
+    {
+        var (draw, feed) = SpawnStrandedNeighbours();
+
+        _ = draw.parent.MakeMinified();
+        PowerDiodeLinking.LinkSpawned(draw, feed);
+
+        Expect.IsNull(draw.Partner);
+        Expect.IsNull(feed.Partner);
+    }
+
+    [Test]
+    public void LinkSpawnedRefusesAnOutletReinstalledAwayFromTheIntake()
+    {
+        var (draw, feed) = SpawnStrandedNeighbours();
+
+        var minified = feed.parent.MakeMinified();
+        minified.InnerThing = null;
+        _ = GenSpawn.Spawn(feed.parent, Origin + (IntVec3.North * 5), Map);
+        Expect.IsTrue(feed.parent.Spawned);
+        Expect.IsNull(feed.Partner);
+        PowerDiodeLinking.LinkSpawned(draw, feed);
+
+        Expect.IsNull(draw.Partner);
+        Expect.IsNull(feed.Partner);
+    }
+
     // Each selected building has its own candidates, so their link gizmos must stay separate
     // rather than merge into one button whose menu only links one of them.
     [Test]

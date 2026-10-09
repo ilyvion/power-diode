@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A power diode outlet no longer keeps feeding its network while its intake is switched off, such as during a power shortage on the intake side or right after the intake is built. Previously the outlet side got that power for free, without the intake network supplying it.
 - Power conduit blueprints connect visually to the conduits next to them again. Previously, with Power Diode installed, there was a gap between a built conduit and a blueprint placed next to it, on every map.
 - Changing the operating mode with several power diode outlets selected now changes it on all of them. Previously only one of the selected outlets switched to the chosen mode.
+- Power diodes now treat batteries stunned by an EMP as empty, as the rest of the game does. Previously their charge still counted toward the battery reserve and the Overflow and Top-up thresholds while they were stunned.
 
 ## [0.2.1] - 2026-09-16
 

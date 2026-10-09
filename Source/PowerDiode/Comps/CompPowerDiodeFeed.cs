@@ -270,15 +270,11 @@ internal class CompPowerDiodeFeed : ThingComp
         }
         IsSharedGridDegenerate = false;
 
-        SourceBatteryStoredWattDays = sourceNet.batteryComps.Sum(battery =>
-            Math.Max(0f, battery.StoredEnergy)
-        );
+        SourceBatteryStoredWattDays = sourceNet.batteryComps.Sum(UsableStoredEnergy);
         SourceBatteryCapacityWattDays = sourceNet.batteryComps.Sum(battery =>
             battery.Props.storedEnergyMax
         );
-        SinkBatteryStoredWattDays = sinkNet.batteryComps.Sum(battery =>
-            Math.Max(0f, battery.StoredEnergy)
-        );
+        SinkBatteryStoredWattDays = sinkNet.batteryComps.Sum(UsableStoredEnergy);
         SinkBatteryCapacityWattDays = sinkNet.batteryComps.Sum(battery =>
             battery.Props.storedEnergyMax
         );
@@ -320,6 +316,10 @@ internal class CompPowerDiodeFeed : ThingComp
         PowerTrader.PowerOutput = CurrentFlowWatts;
         partner.PowerTrader.PowerOutput = -CurrentFlowWatts;
     }
+
+    // Matches vanilla's PowerNet.CurrentStoredEnergy, which counts an EMP-stunned battery as empty.
+    private static float UsableStoredEnergy(CompPowerBattery battery) =>
+        battery.StunnedByEMP ? 0f : Math.Max(0f, battery.StoredEnergy);
 
     private static float NetBalanceExcluding(PowerNet net, CompPowerTrader self)
     {

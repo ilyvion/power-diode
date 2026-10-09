@@ -5,10 +5,10 @@ Usage: ./generate.py
 
 Preview.png: renders LogoText_Power.svg and LogoText_Diode.svg with rsvg-convert,
 crops/rescales the screenshot to 640x360, and composites the two words (with a soft
-drop shadow) onto it: POWER centered above the output battery, DIODE (with its
-RimWorld-style O) centered below it, both an equal distance from the top/bottom edges.
+drop shadow) onto the empty right side of the scene: POWER over the soil, DIODE (with its
+RimWorld-style O) over the floor tiles, both an equal distance from the top/bottom edges.
 
-ModIcon.png: rasterizes Common/Textures/Buildings/PowerDiodeDrawNode.svg to 64x64.
+ModIcon.png: rasterizes Common/Textures/Buildings/PowerDiodeFeedNode.svg (the outlet) to 64x64.
 """
 import subprocess
 from pathlib import Path
@@ -16,8 +16,8 @@ from pathlib import Path
 from PIL import Image, ImageFilter
 
 ABOUT_DIR = Path(__file__).parent
-SCREENSHOT = ABOUT_DIR / "Screenshot From 2026-09-03 15-24-07.png"
-DRAW_NODE_SVG = ABOUT_DIR.parent / "Common" / "Textures" / "Buildings" / "PowerDiodeDrawNode.svg"
+SCREENSHOT = ABOUT_DIR / "PreviewScreenshot.png"
+FEED_NODE_SVG = ABOUT_DIR.parent / "Common" / "Textures" / "Buildings" / "PowerDiodeFeedNode.svg"
 PREVIEW_SIZE = (640, 360)
 CENTER_X = 486
 TOP_MARGIN = 22
@@ -68,7 +68,7 @@ def generate_mod_icon() -> None:
             "magick",
             "-background", "none",
             "-density", "384",
-            str(DRAW_NODE_SVG),
+            str(FEED_NODE_SVG),
             "-resize", f"{MOD_ICON_SIZE}x{MOD_ICON_SIZE}",
             str(ABOUT_DIR / "ModIcon.png"),
         ],

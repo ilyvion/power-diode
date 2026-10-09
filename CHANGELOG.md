@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The mod's preview image and icon now show the redrawn power diode intakes and outlets, including the wall-mounted ones.
+
 ### Fixed
 
 - Power diode intakes and outlets, including the wall-mounted ones, can no longer be rotated while placing them. Rotating them did nothing except turn their texture sideways or upside down.

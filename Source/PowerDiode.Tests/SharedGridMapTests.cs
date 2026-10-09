@@ -121,6 +121,56 @@ internal sealed class SharedGridMapTests
         Expect.IsFalse(feed.IsSharedGridDegenerate, "shared grid cleared");
     }
 
+    // Clears the power grid overlay's dirty flag on the section holding cell, runs action, and
+    // reports whether the flag was set again, leaving the section at least as dirty as before.
+    private static bool RedrawsPowerGridAt(IntVec3 cell, Action action)
+    {
+        var section = Map.mapDrawer.SectionAt(cell);
+        var previousFlags = section.dirtyFlags;
+        ulong powerGrid = MapMeshFlagDefOf.PowerGrid;
+        section.dirtyFlags &= ~powerGrid;
+        action();
+        var redrawn = (section.dirtyFlags & powerGrid) != 0;
+        section.dirtyFlags |= previousFlags;
+        return redrawn;
+    }
+
+    [Test]
+    public void PairCellsAreRedrawnWhenADistantConnectionJoinsOrSplitsBothSides()
+    {
+        var feed = SpawnDiode();
+        Map.powerNetManager.UpdatePowerNetsAndConnections_First();
+        Expect.IsNotNull(feed.Partner);
+        Find.TickManager.DoSingleTick();
+        Expect.IsFalse(feed.IsSharedGridDegenerate, "separate grids");
+
+        var middleConduit = SpawnConduitsJoiningBothSides();
+        Map.powerNetManager.UpdatePowerNetsAndConnections_First();
+        Expect.IsTrue(
+            RedrawsPowerGridAt(feed.parent.Position, Find.TickManager.DoSingleTick),
+            "redrawn when joined"
+        );
+        Expect.IsTrue(feed.IsSharedGridDegenerate, "shared grid detected");
+
+        middleConduit.Destroy();
+        Map.powerNetManager.UpdatePowerNetsAndConnections_First();
+        Expect.IsTrue(
+            RedrawsPowerGridAt(feed.parent.Position, Find.TickManager.DoSingleTick),
+            "redrawn when split"
+        );
+        Expect.IsFalse(feed.IsSharedGridDegenerate, "shared grid cleared");
+    }
+
+    [Test]
+    public void UnchangedSharedGridStateDoesNotRedrawThePair()
+    {
+        var feed = SpawnDiode();
+        Map.powerNetManager.UpdatePowerNetsAndConnections_First();
+        Find.TickManager.DoSingleTick();
+
+        Expect.IsFalse(RedrawsPowerGridAt(feed.parent.Position, Find.TickManager.DoSingleTick));
+    }
+
     [Test]
     public void PairedDiodeWithNothingToFeedShowsIdleOnBothSides()
     {

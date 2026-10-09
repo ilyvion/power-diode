@@ -109,7 +109,24 @@ internal class CompPowerDiodeFeed : ThingComp
     // keep separate, making the diode's own flow redundant (and, if it kept feeding, a pointless
     // net-zero self-loop). Detected live every tick rather than cached, since a connection can
     // appear or disappear at any time (a new conduit built or removed elsewhere on the map).
-    internal bool IsSharedGridDegenerate { get; private set; }
+    // Whether the wire graphics link across the pair depends on this, and a distant connection
+    // doesn't redraw the pair's cells, so they're redrawn whenever it changes.
+    internal bool IsSharedGridDegenerate
+    {
+        get;
+        private set
+        {
+            if (field == value)
+            {
+                return;
+            }
+            field = value;
+            if (parent.Spawned)
+            {
+                parent.Map.powerNetManager.NotifyDrawersForWireUpdate(parent.Position);
+            }
+        }
+    }
 
     // Read live from both sides' power nets, so it's right even before the first tick after a
     // spawn or load.

@@ -53,7 +53,7 @@ internal sealed class OperatingModeGizmoTests
     private static Building MakeBuilding(string defName)
     {
         var def = DefDatabase<ThingDef>.GetNamed(defName);
-        var building = (Building)Activator.CreateInstance(def.thingClass);
+        var building = ActivatorUtility.CreateInstance<Building>(def.thingClass);
         building.def = def;
         building.InitializeComps();
         return building;
@@ -74,9 +74,7 @@ internal sealed class OperatingModeGizmoTests
     }
 
     private static readonly PowerDiodeOperatingMode[] AllModes =
-    [
-        .. Enum.GetValues(typeof(PowerDiodeOperatingMode)).Cast<PowerDiodeOperatingMode>(),
-    ];
+        Enum.GetValues<PowerDiodeOperatingMode>();
 
     [Test]
     public static void OnlyTheModesThresholdSliderIsShownAlongsideTheWattageSlider(

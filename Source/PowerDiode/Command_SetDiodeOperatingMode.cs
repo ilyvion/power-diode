@@ -19,8 +19,7 @@ internal sealed class Command_SetDiodeOperatingMode : Command
         base.ProcessInput(ev);
         Find.WindowStack.Add(
             new FloatMenu([
-                .. Enum.GetValues(typeof(PowerDiodeOperatingMode))
-                    .Cast<PowerDiodeOperatingMode>()
+                .. Enum.GetValues<PowerDiodeOperatingMode>()
                     .Select(mode => new FloatMenuOption(mode.Label(), () => SetMode(mode))),
             ])
         );

@@ -12,7 +12,7 @@ internal sealed class CompPowerDiodeFeedSettingsTests
     private static CompPowerDiodeFeed MakeFeedComp()
     {
         var def = DefDatabase<ThingDef>.GetNamed("PowerDiode_FeedNode");
-        var building = (Building)Activator.CreateInstance(def.thingClass);
+        var building = ActivatorUtility.CreateInstance<Building>(def.thingClass);
         building.def = def;
         building.InitializeComps();
         return building.GetComp<CompPowerDiodeFeed>();

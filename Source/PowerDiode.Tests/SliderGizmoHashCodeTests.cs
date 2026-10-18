@@ -20,7 +20,7 @@ internal sealed class SliderGizmoHashCodeTests
     private static CompPowerDiodeFeed MakeFeedComp(int thingIDNumber)
     {
         var def = DefDatabase<ThingDef>.GetNamed("PowerDiode_FeedNode");
-        var building = (Building)Activator.CreateInstance(def.thingClass);
+        var building = ActivatorUtility.CreateInstance<Building>(def.thingClass);
         building.def = def;
         building.thingIDNumber = thingIDNumber;
         building.InitializeComps();

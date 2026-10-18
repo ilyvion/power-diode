@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+    <ilyvion.Laboratory.VersionCheckDef>
+        <defName>PowerDiode_VersionCheck</defName>
+        <modName>Power Diode</modName>
+        <majorVersion>0</majorVersion>
+        <minorVersion>26</minorVersion>
+    </ilyvion.Laboratory.VersionCheckDef>
+</Defs>

@@ -13,7 +13,7 @@ internal sealed class LinkSpawnedGuardTests
         where T : ThingComp
     {
         var def = DefDatabase<ThingDef>.GetNamed(defName);
-        var building = (Building)Activator.CreateInstance(def.thingClass);
+        var building = ActivatorUtility.CreateInstance<Building>(def.thingClass);
         building.def = def;
         building.InitializeComps();
         return building.GetComp<T>();

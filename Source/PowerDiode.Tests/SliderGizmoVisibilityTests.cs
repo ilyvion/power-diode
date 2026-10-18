@@ -45,7 +45,7 @@ internal sealed class SliderGizmoVisibilityTests
     private static Building MakeBuilding(string defName)
     {
         var def = DefDatabase<ThingDef>.GetNamed(defName);
-        var building = (Building)Activator.CreateInstance(def.thingClass);
+        var building = ActivatorUtility.CreateInstance<Building>(def.thingClass);
         building.def = def;
         building.InitializeComps();
         return building;

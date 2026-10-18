@@ -8,7 +8,7 @@ internal sealed class ResourcesTests
     [Test]
     public static void OperatingModeIconsAreLoaded()
     {
-        foreach (PowerDiodeOperatingMode mode in Enum.GetValues(typeof(PowerDiodeOperatingMode)))
+        foreach (var mode in Enum.GetValues<PowerDiodeOperatingMode>())
         {
             var icon = mode.Icon();
             Expect.IsNotNull(icon, mode.ToString());

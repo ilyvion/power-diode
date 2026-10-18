@@ -172,11 +172,11 @@ internal sealed class PowerDiodeFlowTickTests
             SinkCapacityWattDays = 1000f,
         };
 
-        foreach (var mode in Enum.GetValues(typeof(PowerDiodeOperatingMode)))
+        foreach (var mode in Enum.GetValues<PowerDiodeOperatingMode>())
         {
             Expect.AreEqual(
                 0f,
-                PowerDiodeFlow.TickFlowWatts(inputs with { Mode = (PowerDiodeOperatingMode)mode }),
+                PowerDiodeFlow.TickFlowWatts(inputs with { Mode = mode }),
                 mode.ToString()
             );
         }

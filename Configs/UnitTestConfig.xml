@@ -1,0 +1,7 @@
+<TestConfig>
+    <!-- The RimBridge dev mod logs its own startup timing as a warning, which on 1.7 can land
+         inside the first test. -->
+    <warningsAllowed>
+        <li>\[RimBridge\]</li>
+    </warningsAllowed>
+</TestConfig>

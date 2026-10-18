@@ -8,7 +8,7 @@ internal sealed class OperatingModeTranslationTests
     [Test]
     public static void EveryModeHasALabelAndDescription()
     {
-        foreach (PowerDiodeOperatingMode mode in Enum.GetValues(typeof(PowerDiodeOperatingMode)))
+        foreach (var mode in Enum.GetValues<PowerDiodeOperatingMode>())
         {
             Expect.IsTrue($"PowerDiode.Mode.{mode}".CanTranslate(), $"{mode} label");
             Expect.IsTrue($"PowerDiode.Mode.{mode}.Desc".CanTranslate(), $"{mode} description");
